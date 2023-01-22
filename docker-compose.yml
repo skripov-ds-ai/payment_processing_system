@@ -1,4 +1,10 @@
 version: '2.3'
+
+volumes:
+  db-data:
+  tmp-data:
+  redis-data:
+
 services:
   zookeeper:
     hostname: zookeeper
@@ -18,3 +24,23 @@ services:
       - '9092:9092'
       - '8082:8082'
       - '8083:8083'
+
+#https://github.com/nizhikebinesi/golang-test-task/blob/main/docker-compose.yml
+  postgres:
+    image: postgres:14.4
+    restart: on-failure
+    environment:
+      - POSTGRES_USER=gorm
+      - POSTGRES_PASSWORD=gorm
+      - POSTGRES_DB=gorm
+    volumes:
+      - ./dump:/docker-entrypoint-initdb.d/
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - big_net
+
+networks:
+  big_net:
+    driver: bridge

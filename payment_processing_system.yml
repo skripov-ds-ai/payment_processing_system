@@ -1,0 +1,340 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Swagger Payment Processing
+  description: A sample API that uses a petstore as an example to demonstrate features in the OpenAPI 3.0 specification
+  contact:
+    name: Swagger API Team
+    email: nizhikebinesi@gmail.com
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+servers:
+  - url: http://localhost:8080/api
+paths:
+  /balances:
+    get:
+      description: |
+        Returns all balances from the system.
+      operationId: findBalances
+      parameters:
+        - name: sort
+          in: query
+          description: key to sort by - id, date, sum
+          required: false
+          schema:
+            type: string
+            enum: ["id", "date", "sum"]
+        - name: limit
+          in: query
+          description: maximum number of results to return
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: page
+          in: query
+          description: page of collection
+          required: false
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: balance response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Balance'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+#    post:
+#      description: Creates a new balance. Duplicates are not allowed.
+#      operationId: addBalance
+#      requestBody:
+#        description: Pet to add to the store
+#        required: true
+#        content:
+#          application/json:
+#            schema:
+#              $ref: '#/components/schemas/NewBalance'
+#      responses:
+#        '200':
+#          description: balance response
+#          content:
+#            application/json:
+#              schema:
+#                $ref: '#/components/schemas/Balance'
+#        default:
+#          description: unexpected error
+#          content:
+#            application/json:
+#              schema:
+#                $ref: '#/components/schemas/Error'
+  /balances/{idFrom}/transfer/{idTo}:
+    post:
+      description: Transfer money from idFrom balance to idTo balance
+      operationId: transfer by ids
+      parameters:
+        - name: idFrom
+          in: path
+          description: ID of balance to write off
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: idTo
+          in: path
+          description: ID of balance to accrue
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: pet response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Balance'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /balances/{id}/transcations:
+    get:
+      description: Returns transactions binded with single ID
+      operationId: get binded transactions
+      parameters:
+        - name: id
+          in: path
+          description: ID of balance to fetch
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: sort
+          in: query
+          description: key to sort by - id, date, sum
+          required: false
+          schema:
+            type: string
+            enum: ["id", "date", "sum"]
+        - name: limit
+          in: query
+          description: maximum number of results to return
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: page
+          in: query
+          description: page of collection
+          required: false
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: pet response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Balance'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /reservation/balances/{id}:
+    post:
+      description: Reserve balance
+      operationId: reserve on separate account
+      parameters:
+        - name: id
+          in: path
+          description: ID of balance to fetch
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: pet response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Balance'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /reservation/balances/{id}/confirm:
+    post:
+      description: Confirm reservation
+      operationId: confirm reservation
+      parameters:
+        - name: id
+          in: path
+          description: ID of balance to fetch
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: pet response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Balance'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /reservation/balances/{id}/cancel:
+    post:
+      description: Cancel reservation
+      operationId: cancel reservation
+      parameters:
+        - name: id
+          in: path
+          description: ID of balance to fetch
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: pet response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Balance'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /balances/{id}:
+    get:
+      description: Returns a balance based on a single ID
+      operationId: find balance by id
+      parameters:
+        - name: id
+          in: path
+          description: ID of balance to fetch
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: currency
+          in: query
+          description: Currency to display balance
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: pet response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Balance'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      description: Creates a new balance(by accrual) or decreases an existed balance. Duplicates are not allowed.
+      operationId: accrueOrWriteOffBalance
+      parameters:
+        - name: id
+          in: path
+          description: ID of pet to fetch
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Pet to add to the store
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewBalance'
+      responses:
+        '200':
+          description: balance response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Balance'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+#    delete:
+#      description: deletes a single pet based on the ID supplied
+#      operationId: deletePet
+#      parameters:
+#        - name: id
+#          in: path
+#          description: ID of pet to delete
+#          required: true
+#          schema:
+#            type: integer
+#            format: int64
+#      responses:
+#        '204':
+#          description: pet deleted
+#        default:
+#          description: unexpected error
+#          content:
+#            application/json:
+#              schema:
+#                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    Balance:
+      allOf:
+        - $ref: '#/components/schemas/NewBalance'
+        - type: object
+    NewBalance:
+      type: object
+      required:
+        - amount
+        - id
+      properties:
+        amount:
+          type: integer
+          format: int64
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
