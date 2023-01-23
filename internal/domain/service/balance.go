@@ -8,9 +8,9 @@ import (
 
 type BalanceStorage interface {
 	GetByID(ctx context.Context, id string) (*entity.Balance, error)
-	//GetAll(ctx context.Context, limit, offset int) ([]entity.Balance, error)
-	//Create(ctx context.Context, balance entity.Balance) (entity.Balance, error)
-	//Update(ctx context.Context, id string, amount int64) error
+	// GetAll(ctx context.Context, limit, offset int) ([]entity.Balance, error)
+	// Create(ctx context.Context, balance entity.Balance) (entity.Balance, error)
+	// Update(ctx context.Context, id string, amount int64) error
 	IncreaseAmount(ctx context.Context, id string, amount int64) error
 	DecreaseAmount(ctx context.Context, id string, amount int64) error
 }
@@ -23,9 +23,9 @@ func (s BalanceService) GetByID(ctx context.Context, id string) (*entity.Balance
 	return s.storage.GetByID(ctx, id)
 }
 
-//func (s BalanceService) Create(ctx context.Context, balance entity.Balance) (entity.Balance, error) {
+// func (s BalanceService) Create(ctx context.Context, balance entity.Balance) (entity.Balance, error) {
 //	return s.storage.Create(ctx, balance)
-//}
+// }
 
 func (s BalanceService) ChangeAmount(ctx context.Context, id string, amount int64) error {
 	if amount == 0 {
