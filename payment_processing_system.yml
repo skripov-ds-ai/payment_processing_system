@@ -276,8 +276,8 @@ components:
         id:
           type: string
         amount:
-          type: integer
-          format: int64
+          type: number
+          format: float
     Error:
       type: object
       required:

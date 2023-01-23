@@ -9,6 +9,11 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+// Converter of currency
+type Converter interface {
+	ConvertFromRUBToCurrency(amount float32, currency string) (float32, error)
+}
+
 // BalanceService is standard service for balance
 type BalanceService interface {
 	GetByID(ctx context.Context, id string) (*entity.Balance, error)
@@ -16,7 +21,8 @@ type BalanceService interface {
 }
 
 type balanceHandler struct {
-	service BalanceService
+	service   BalanceService
+	converter Converter
 }
 
 // GetBalanceByID returns json of balance object or error
@@ -40,7 +46,20 @@ func (b *balanceHandler) GetBalanceByID(ctx echo.Context, id string, params GetB
 		_ = ctx.JSON(http.StatusNotFound, e)
 		return nil
 	}
-	// TODO: wrap an error
+	// convert
+	if params.Currency != nil && *params.Currency != "RUB" {
+		newAmount, err := b.converter.ConvertFromRUBToCurrency(balance.Amount, *params.Currency)
+		if err != nil {
+			e := Error{
+				Code:    http.StatusBadRequest,
+				Message: fmt.Sprintf("something went wrong during convertation to %s", *params.Currency),
+			}
+			// TODO: wrap an error
+			_ = ctx.JSON(http.StatusNotFound, e)
+			return err
+		}
+		balance.Amount = newAmount
+	}
 	_ = ctx.JSON(http.StatusOK, *balance)
 	return nil
 }
