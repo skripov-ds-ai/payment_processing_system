@@ -2,6 +2,7 @@ package writer
 
 import (
 	"context"
+
 	"github.com/segmentio/kafka-go"
 )
 
