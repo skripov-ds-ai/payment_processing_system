@@ -1,6 +1,6 @@
 package entity
 
 type Balance struct {
-	UserUUID string `json:"user_uuid"`
-	Amount   int64  `json:"amount"`
+	UserID string `json:"user_id"`
+	Amount int64  `json:"amount"`
 }
