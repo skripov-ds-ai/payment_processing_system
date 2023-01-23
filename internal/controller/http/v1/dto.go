@@ -19,7 +19,8 @@ const (
 
 // Balance defines model for Balance.
 type Balance struct {
-	Amount int64 `json:"amount"`
+	Amount int64  `json:"amount"`
+	Id     string `json:"id"`
 }
 
 // Error defines model for Error.
@@ -30,7 +31,8 @@ type Error struct {
 
 // NewBalance defines model for NewBalance.
 type NewBalance struct {
-	Amount int64 `json:"amount"`
+	Amount int64  `json:"amount"`
+	Id     string `json:"id"`
 }
 
 // FindBalancesParams defines parameters for FindBalances.
@@ -48,8 +50,8 @@ type FindBalancesParams struct {
 // FindBalancesParamsSort defines parameters for FindBalances.
 type FindBalancesParamsSort string
 
-// FindBalanceByIdParams defines parameters for FindBalanceById.
-type FindBalanceByIdParams struct {
+// GetBalanceByIdParams defines parameters for GetBalanceByID.
+type GetBalanceByIdParams struct {
 	// Currency Currency to display balance
 	Currency *string `form:"currency,omitempty" json:"currency,omitempty"`
 }

@@ -54,29 +54,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-#    post:
-#      description: Creates a new balance. Duplicates are not allowed.
-#      operationId: addBalance
-#      requestBody:
-#        description: Pet to add to the store
-#        required: true
-#        content:
-#          application/json:
-#            schema:
-#              $ref: '#/components/schemas/NewBalance'
-#      responses:
-#        '200':
-#          description: balance response
-#          content:
-#            application/json:
-#              schema:
-#                $ref: '#/components/schemas/Balance'
-#        default:
-#          description: unexpected error
-#          content:
-#            application/json:
-#              schema:
-#                $ref: '#/components/schemas/Error'
   /balances/{idFrom}/transfer/{idTo}:
     post:
       description: Transfer money from idFrom balance to idTo balance
@@ -87,15 +64,13 @@ paths:
           description: ID of balance to write off
           required: true
           schema:
-            type: integer
-            format: int64
+            type: string
         - name: idTo
           in: path
           description: ID of balance to accrue
           required: true
           schema:
-            type: integer
-            format: int64
+            type: string
       responses:
         '200':
           description: pet response
@@ -119,8 +94,7 @@ paths:
           description: ID of balance to fetch
           required: true
           schema:
-            type: integer
-            format: int64
+            type: string
         - name: sort
           in: query
           description: key to sort by - id, date, sum
@@ -165,8 +139,7 @@ paths:
           description: ID of balance to fetch
           required: true
           schema:
-            type: integer
-            format: int64
+            type: string
       responses:
         '200':
           description: pet response
@@ -190,8 +163,7 @@ paths:
           description: ID of balance to fetch
           required: true
           schema:
-            type: integer
-            format: int64
+            type: string
       responses:
         '200':
           description: pet response
@@ -215,8 +187,7 @@ paths:
           description: ID of balance to fetch
           required: true
           schema:
-            type: integer
-            format: int64
+            type: string
       responses:
         '200':
           description: pet response
@@ -233,15 +204,14 @@ paths:
   /balances/{id}:
     get:
       description: Returns a balance based on a single ID
-      operationId: find balance by id
+      operationId: get balance by id
       parameters:
         - name: id
           in: path
           description: ID of balance to fetch
           required: true
           schema:
-            type: integer
-            format: int64
+            type: string
         - name: currency
           in: query
           description: Currency to display balance
@@ -270,8 +240,7 @@ paths:
           description: ID of pet to fetch
           required: true
           schema:
-            type: integer
-            format: int64
+            type: string
       requestBody:
         description: Pet to add to the store
         required: true
@@ -292,26 +261,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-#    delete:
-#      description: deletes a single pet based on the ID supplied
-#      operationId: deletePet
-#      parameters:
-#        - name: id
-#          in: path
-#          description: ID of pet to delete
-#          required: true
-#          schema:
-#            type: integer
-#            format: int64
-#      responses:
-#        '204':
-#          description: pet deleted
-#        default:
-#          description: unexpected error
-#          content:
-#            application/json:
-#              schema:
-#                $ref: '#/components/schemas/Error'
 components:
   schemas:
     Balance:
@@ -324,6 +273,8 @@ components:
         - amount
         - id
       properties:
+        id:
+          type: string
         amount:
           type: integer
           format: int64

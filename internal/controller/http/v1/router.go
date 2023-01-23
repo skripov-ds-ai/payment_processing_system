@@ -18,25 +18,25 @@ type ServerInterface interface {
 	FindBalances(ctx echo.Context, params FindBalancesParams) error
 
 	// (POST /balances/{idFrom}/transfer/{idTo})
-	TransferByIds(ctx echo.Context, idFrom int64, idTo int64) error
+	TransferByIds(ctx echo.Context, idFrom string, idTo string) error
 
 	// (GET /balances/{id})
-	FindBalanceById(ctx echo.Context, id int64, params FindBalanceByIdParams) error
+	GetBalanceById(ctx echo.Context, id string, params GetBalanceByIdParams) error
 
 	// (POST /balances/{id})
-	AccrueOrWriteOffBalance(ctx echo.Context, id int64) error
+	AccrueOrWriteOffBalance(ctx echo.Context, id string) error
 
 	// (GET /balances/{id}/transcations)
-	GetBindedTransactions(ctx echo.Context, id int64, params GetBindedTransactionsParams) error
+	GetBindedTransactions(ctx echo.Context, id string, params GetBindedTransactionsParams) error
 
 	// (POST /reservation/balances/{id})
-	ReserveOnSeparateAccount(ctx echo.Context, id int64) error
+	ReserveOnSeparateAccount(ctx echo.Context, id string) error
 
 	// (POST /reservation/balances/{id}/cancel)
-	CancelReservation(ctx echo.Context, id int64) error
+	CancelReservation(ctx echo.Context, id string) error
 
 	// (POST /reservation/balances/{id}/confirm)
-	ConfirmReservation(ctx echo.Context, id int64) error
+	ConfirmReservation(ctx echo.Context, id string) error
 }
 
 // ServerInterfaceWrapper converts echo contexts to parameters.
@@ -80,7 +80,7 @@ func (w *ServerInterfaceWrapper) FindBalances(ctx echo.Context) error {
 func (w *ServerInterfaceWrapper) TransferByIds(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "idFrom" -------------
-	var idFrom int64
+	var idFrom string
 
 	err = runtime.BindStyledParameterWithLocation("simple", false, "idFrom", runtime.ParamLocationPath, ctx.Param("idFrom"), &idFrom)
 	if err != nil {
@@ -88,7 +88,7 @@ func (w *ServerInterfaceWrapper) TransferByIds(ctx echo.Context) error {
 	}
 
 	// ------------- Path parameter "idTo" -------------
-	var idTo int64
+	var idTo string
 
 	err = runtime.BindStyledParameterWithLocation("simple", false, "idTo", runtime.ParamLocationPath, ctx.Param("idTo"), &idTo)
 	if err != nil {
@@ -100,11 +100,11 @@ func (w *ServerInterfaceWrapper) TransferByIds(ctx echo.Context) error {
 	return err
 }
 
-// FindBalanceById converts echo context to params.
-func (w *ServerInterfaceWrapper) FindBalanceById(ctx echo.Context) error {
+// GetBalanceById converts echo context to params.
+func (w *ServerInterfaceWrapper) GetBalanceById(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "id" -------------
-	var id int64
+	var id string
 
 	err = runtime.BindStyledParameterWithLocation("simple", false, "id", runtime.ParamLocationPath, ctx.Param("id"), &id)
 	if err != nil {
@@ -112,7 +112,7 @@ func (w *ServerInterfaceWrapper) FindBalanceById(ctx echo.Context) error {
 	}
 
 	// Parameter object where we will unmarshal all parameters from the context
-	var params FindBalanceByIdParams
+	var params GetBalanceByIdParams
 	// ------------- Optional query parameter "currency" -------------
 
 	err = runtime.BindQueryParameter("form", true, false, "currency", ctx.QueryParams(), &params.Currency)
@@ -121,7 +121,7 @@ func (w *ServerInterfaceWrapper) FindBalanceById(ctx echo.Context) error {
 	}
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.FindBalanceById(ctx, id, params)
+	err = w.Handler.GetBalanceById(ctx, id, params)
 	return err
 }
 
@@ -129,7 +129,7 @@ func (w *ServerInterfaceWrapper) FindBalanceById(ctx echo.Context) error {
 func (w *ServerInterfaceWrapper) AccrueOrWriteOffBalance(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "id" -------------
-	var id int64
+	var id string
 
 	err = runtime.BindStyledParameterWithLocation("simple", false, "id", runtime.ParamLocationPath, ctx.Param("id"), &id)
 	if err != nil {
@@ -145,7 +145,7 @@ func (w *ServerInterfaceWrapper) AccrueOrWriteOffBalance(ctx echo.Context) error
 func (w *ServerInterfaceWrapper) GetBindedTransactions(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "id" -------------
-	var id int64
+	var id string
 
 	err = runtime.BindStyledParameterWithLocation("simple", false, "id", runtime.ParamLocationPath, ctx.Param("id"), &id)
 	if err != nil {
@@ -184,7 +184,7 @@ func (w *ServerInterfaceWrapper) GetBindedTransactions(ctx echo.Context) error {
 func (w *ServerInterfaceWrapper) ReserveOnSeparateAccount(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "id" -------------
-	var id int64
+	var id string
 
 	err = runtime.BindStyledParameterWithLocation("simple", false, "id", runtime.ParamLocationPath, ctx.Param("id"), &id)
 	if err != nil {
@@ -200,7 +200,7 @@ func (w *ServerInterfaceWrapper) ReserveOnSeparateAccount(ctx echo.Context) erro
 func (w *ServerInterfaceWrapper) CancelReservation(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "id" -------------
-	var id int64
+	var id string
 
 	err = runtime.BindStyledParameterWithLocation("simple", false, "id", runtime.ParamLocationPath, ctx.Param("id"), &id)
 	if err != nil {
@@ -216,7 +216,7 @@ func (w *ServerInterfaceWrapper) CancelReservation(ctx echo.Context) error {
 func (w *ServerInterfaceWrapper) ConfirmReservation(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "id" -------------
-	var id int64
+	var id string
 
 	err = runtime.BindStyledParameterWithLocation("simple", false, "id", runtime.ParamLocationPath, ctx.Param("id"), &id)
 	if err != nil {
@@ -258,7 +258,7 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 
 	router.GET(baseURL+"/balances", wrapper.FindBalances)
 	router.POST(baseURL+"/balances/:idFrom/transfer/:idTo", wrapper.TransferByIds)
-	router.GET(baseURL+"/balances/:id", wrapper.FindBalanceById)
+	router.GET(baseURL+"/balances/:id", wrapper.GetBalanceById)
 	router.POST(baseURL+"/balances/:id", wrapper.AccrueOrWriteOffBalance)
 	router.GET(baseURL+"/balances/:id/transcations", wrapper.GetBindedTransactions)
 	router.POST(baseURL+"/reservation/balances/:id", wrapper.ReserveOnSeparateAccount)
