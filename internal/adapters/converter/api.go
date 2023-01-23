@@ -2,10 +2,11 @@ package converter
 
 import (
 	"fmt"
-	jsoniter "github.com/json-iterator/go"
 	"io"
 	"net/http"
 	"time"
+
+	jsoniter "github.com/json-iterator/go"
 )
 
 const templateURL = "https://api.apilayer.com/exchangerates_data/convert?to=%s&from=RUB&amount=%.2f"

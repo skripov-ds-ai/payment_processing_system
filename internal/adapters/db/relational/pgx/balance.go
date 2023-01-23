@@ -80,7 +80,7 @@ func (bs *balanceStorage) GetByID(ctx context.Context, id string) (*entity.Balan
 	}
 	var obj entity.Balance
 	err := bs.pool.QueryRow(ctx, sql, args...).Scan(
-		&obj.UserID,
+		&obj.ID,
 		&obj.Amount)
 	if err != nil {
 		// TODO: wrap error
