@@ -2,12 +2,10 @@ package v1
 
 import (
 	"github.com/labstack/echo/v4"
-	log "payment_processing_system/pkg/logger"
 )
 
 type Server struct {
 	balance *balanceHandler
-	logger  log.Logger
 }
 
 // (GET /balances)

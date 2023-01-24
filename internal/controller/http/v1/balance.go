@@ -34,6 +34,8 @@ func (b *balanceHandler) GetBalanceByID(ctx echo.Context, id string, params GetB
 	balance, err := b.service.GetByID(ctx.Request().Context(), id)
 	if err != nil {
 		// TODO: add logging
+		// TODO: think about zap.Field vs interface
+		b.logger.Error("error during getting balance", "id", id)
 		e := Error{
 			Code:    http.StatusBadRequest,
 			Message: fmt.Sprintf("something went wrong during getting balance by id = %s", id),
