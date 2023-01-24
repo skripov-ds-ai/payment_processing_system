@@ -12,6 +12,8 @@ const (
 	StatusCreated    TransactionStatus = "created"
 	StatusCompleted  TransactionStatus = "completed"
 	StatusProcessing TransactionStatus = "processing"
+	// TODO: add this to logic!
+	StatusShouldRetry TransactionStatus = "should_retry"
 
 	TypeOuterIncreasing TransactionType = "increasing"
 	TypeOuterDecreasing TransactionType = "decreasing"
