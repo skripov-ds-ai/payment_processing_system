@@ -4,16 +4,17 @@ import (
 	"context"
 	"fmt"
 	"payment_processing_system/internal/domain/entity"
+	log "payment_processing_system/pkg/logger"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/labstack/gommon/log"
 )
 
 type balanceStorage struct {
 	tableScheme  string
 	queryBuilder sq.StatementBuilderType
-	pool         *pgxpool.Pool // TODO: move to interface
+	pool         *pgxpool.Pool
+	logger       log.Logger
 }
 
 func NewBalanceStorage(pool *pgxpool.Pool) *balanceStorage {
@@ -25,12 +26,12 @@ func NewBalanceStorage(pool *pgxpool.Pool) *balanceStorage {
 	}
 }
 
-func (bs *balanceStorage) IncreaseAmount(ctx context.Context, id string, amount int64) error {
+func (bs *balanceStorage) IncreaseAmount(ctx context.Context, id string, amount float32) error {
 	onConflict := "ON CONFLICT DO UPDATE SET amount = amount + ?"
 	sql, args, buildErr := bs.queryBuilder.
 		Insert(bs.tableScheme).Columns("id", "amount").
 		Values(id, amount).Suffix(onConflict, amount).ToSql()
-	log.Info(fmt.Sprintf("table = %q ; sql = %q ; args = %q", bs.tableScheme, sql, args))
+	bs.logger.Info(fmt.Sprintf("table = %q ; sql = %q ; args = %q", bs.tableScheme, sql, args))
 	if buildErr != nil {
 		// TODO: add wrapping
 		// buildErr
@@ -46,12 +47,12 @@ func (bs *balanceStorage) IncreaseAmount(ctx context.Context, id string, amount 
 	return nil
 }
 
-func (bs *balanceStorage) DecreaseAmount(ctx context.Context, id string, amount int64) error {
+func (bs *balanceStorage) DecreaseAmount(ctx context.Context, id string, amount float32) error {
 	sql, args, buildErr := bs.queryBuilder.
 		Update(bs.tableScheme).
-		Set("amount", fmt.Sprintf("amount + %d", amount)).
+		Set("amount", fmt.Sprintf("amount + %f", amount)).
 		Where(sq.Eq{"id": id}).ToSql()
-	log.Info(fmt.Sprintf("table = %q ; sql = %q ; args = %q", bs.tableScheme, sql, args))
+	bs.logger.Info(fmt.Sprintf("table = %q ; sql = %q ; args = %q", bs.tableScheme, sql, args))
 	if buildErr != nil {
 		// TODO: add wrapping
 		// buildErr
@@ -72,7 +73,7 @@ func (bs *balanceStorage) GetByID(ctx context.Context, id string) (*entity.Balan
 		Select("id").Columns("amount").
 		From(bs.tableScheme).Where(sq.Eq{"id": id}).ToSql()
 	// TODO: add logging
-	log.Info(fmt.Sprintf("table = %q ; sql = %q ; args = %q", bs.tableScheme, sql, args))
+	bs.logger.Info(fmt.Sprintf("table = %q ; sql = %q ; args = %q", bs.tableScheme, sql, args))
 	if buildErr != nil {
 		// TODO: add wrapping
 		// buildErr

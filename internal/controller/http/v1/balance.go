@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"payment_processing_system/internal/domain/entity"
+	log "payment_processing_system/pkg/logger"
 
 	"github.com/labstack/echo/v4"
 )
@@ -17,12 +18,13 @@ type Converter interface {
 // BalanceService is standard service for balance
 type BalanceService interface {
 	GetByID(ctx context.Context, id string) (*entity.Balance, error)
-	ChangeAmount(ctx context.Context, id string, amount int64) error
+	ChangeAmount(ctx context.Context, id string, amount float32) error
 }
 
 type balanceHandler struct {
 	service   BalanceService
 	converter Converter
+	logger    log.Logger
 }
 
 // GetBalanceByID returns json of balance object or error
