@@ -19,6 +19,7 @@ type TransactionService interface {
 	ProcessingByID(ctx context.Context, id string) error
 	CompletedByID(ctx context.Context, id string) error
 	ShouldRetryByID(ctx context.Context, id string) error
+	CannotApplyByID(ctx context.Context, id string) error
 }
 
 type BalanceUseCase struct {

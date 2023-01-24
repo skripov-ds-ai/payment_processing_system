@@ -8,12 +8,13 @@ type (
 )
 
 const (
-	StatusCancelled  TransactionStatus = "cancelled"
-	StatusCreated    TransactionStatus = "created"
-	StatusCompleted  TransactionStatus = "completed"
-	StatusProcessing TransactionStatus = "processing"
-	// TODO: add this to logic!
+	StatusCancelled   TransactionStatus = "cancelled"
+	StatusCreated     TransactionStatus = "created"
+	StatusCompleted   TransactionStatus = "completed"
+	StatusProcessing  TransactionStatus = "processing"
 	StatusShouldRetry TransactionStatus = "should_retry"
+	// TODO: add this to logic!
+	StatusCannotApply TransactionStatus = "cannot_apply"
 
 	TypeOuterIncreasing TransactionType = "increasing"
 	TypeOuterDecreasing TransactionType = "decreasing"
