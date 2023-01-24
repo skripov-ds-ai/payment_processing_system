@@ -15,8 +15,8 @@ const (
 
 	TypeOuterIncreasing TransactionType = "increasing"
 	TypeOuterDecreasing TransactionType = "decreasing"
-	TypeTransfer TransactionType = "transfer"
-	TypePayment TransactionType = "payment"
+	TypeTransfer        TransactionType = "transfer"
+	TypePayment         TransactionType = "payment"
 )
 
 // Transaction is entity to represent transaction in payment processing system
@@ -27,6 +27,6 @@ type Transaction struct {
 	DestinationID *string           `json:"destination_id"`
 	Amount        float32           `json:"amount"`
 	Type          TransactionType   `json:"type"`
-	DateTime time.Time         `json:"date_time"`
-	Status   TransactionStatus `json:"status"`
+	DateTime      time.Time         `json:"date_time"`
+	Status        TransactionStatus `json:"status"`
 }
