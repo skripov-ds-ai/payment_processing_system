@@ -33,7 +33,10 @@ func (bs *balanceStorage) IncreaseAmount(ctx context.Context, id string, amount 
 	sql, args, buildErr := bs.queryBuilder.
 		Insert(bs.tableScheme).Columns("id", "amount").
 		Values(id, amount).Suffix(onConflict, amount).ToSql()
-	bs.logger.Info(fmt.Sprintf("table = %q ; sql = %q ; args = %q", bs.tableScheme, sql, args))
+	bs.logger.Info("upsert sql",
+		zap.String("table", bs.tableScheme),
+		zap.String("sql", sql),
+		zap.String("args", fmt.Sprintf("%v", args)))
 	if buildErr != nil {
 		// TODO: add wrapping
 		// buildErr
@@ -58,7 +61,6 @@ func (bs *balanceStorage) DecreaseAmount(ctx context.Context, id string, amount 
 		zap.String("table", bs.tableScheme),
 		zap.String("sql", sql),
 		zap.String("args", fmt.Sprintf("%v", args)))
-
 	if buildErr != nil {
 		// TODO: add wrapping
 		// buildErr
@@ -76,10 +78,12 @@ func (bs *balanceStorage) DecreaseAmount(ctx context.Context, id string, amount 
 
 func (bs *balanceStorage) GetByID(ctx context.Context, id string) (*entity.Balance, error) {
 	sql, args, buildErr := bs.queryBuilder.
-		Select("id").Columns("amount").
+		Select("id", "amount").
 		From(bs.tableScheme).Where(sq.Eq{"id": id}).ToSql()
-	// TODO: add logging
-	bs.logger.Info(fmt.Sprintf("table = %q ; sql = %q ; args = %q", bs.tableScheme, sql, args))
+	bs.logger.Info("select sql",
+		zap.String("table", bs.tableScheme),
+		zap.String("sql", sql),
+		zap.String("args", fmt.Sprintf("%v", args)))
 	if buildErr != nil {
 		// TODO: add wrapping
 		// buildErr

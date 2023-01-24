@@ -66,12 +66,14 @@
 - Метод резервирования средств с основного баланса на отдельном счете. 
 Принимает id пользователя, ИД услуги, ИД заказа, стоимость. (POST `/reservation/balances/{id}`)
 
-=> Transaction(source, destination, type, amount, status; 
+=> Transaction(id, source, destination, type, amount, status, datetime; 
+id
 type - просто начисление извне, просто списание, трансфер между пользователями, оплата услуги от пользователя к нам) - 
 source - NULL или balance_id
 destination - NULL или balance_id
 source и destination не могут быть одновременно NULL
 status - processing(обрабатывается), cancelled(отменено), completed(завершено), waiting(создан, но не обрабатывается)
+datetime
 => Order(order_id, service_id, transaction_id) - объект хранит дополнительную информацию о транзакциях оплаты услуг
 
 - Метод признания выручки – списывает из резерва деньги, добавляет данные 
