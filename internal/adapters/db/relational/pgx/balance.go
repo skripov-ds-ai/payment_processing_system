@@ -4,7 +4,8 @@ import (
 	"context"
 	"fmt"
 	"payment_processing_system/internal/domain/entity"
-	log "payment_processing_system/pkg/logger"
+
+	"go.uber.org/zap"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -14,7 +15,7 @@ type balanceStorage struct {
 	tableScheme  string
 	queryBuilder sq.StatementBuilderType
 	pool         *pgxpool.Pool
-	logger       log.Logger
+	logger       *zap.Logger
 }
 
 func NewBalanceStorage(pool *pgxpool.Pool) *balanceStorage {
@@ -52,7 +53,11 @@ func (bs *balanceStorage) DecreaseAmount(ctx context.Context, id string, amount 
 		Update(bs.tableScheme).
 		Set("amount", fmt.Sprintf("amount + %f", amount)).
 		Where(sq.Eq{"id": id}).ToSql()
-	bs.logger.Info(fmt.Sprintf("table = %q ; sql = %q ; args = %q", bs.tableScheme, sql, args))
+	bs.logger.Info("update sql",
+		zap.String("table", bs.tableScheme),
+		zap.String("sql", sql),
+		zap.String("args", fmt.Sprintf("%v", args)))
+
 	if buildErr != nil {
 		// TODO: add wrapping
 		// buildErr

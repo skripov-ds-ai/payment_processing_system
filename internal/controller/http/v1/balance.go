@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"payment_processing_system/internal/domain/entity"
-	log "payment_processing_system/pkg/logger"
+
+	"go.uber.org/zap"
 
 	"github.com/labstack/echo/v4"
 )
@@ -24,7 +25,7 @@ type BalanceService interface {
 type balanceHandler struct {
 	service   BalanceService
 	converter Converter
-	logger    log.Logger
+	logger    *zap.Logger
 }
 
 // GetBalanceByID returns json of balance object or error
@@ -35,7 +36,7 @@ func (b *balanceHandler) GetBalanceByID(ctx echo.Context, id string, params GetB
 	if err != nil {
 		// TODO: add logging
 		// TODO: think about zap.Field vs interface
-		b.logger.Error("error during getting balance", "id", id)
+		b.logger.Error("error during getting balance", zap.String("id", id), zap.Error(err))
 		e := Error{
 			Code:    http.StatusBadRequest,
 			Message: fmt.Sprintf("something went wrong during getting balance by id = %s", id),
