@@ -42,25 +42,38 @@ func (b *balanceHandler) GetBalanceByID(ctx echo.Context, id string, params GetB
 			Message: fmt.Sprintf("something went wrong during getting balance by id = %s", id),
 		}
 		// TODO: wrap an error
-		_ = ctx.JSON(http.StatusBadRequest, e)
+		err1 := ctx.JSON(http.StatusBadRequest, e)
+		if err1 != nil {
+			b.logger.Error("error during sending error json", zap.Error(err1))
+		}
 		return err
 	}
 	if balance == nil {
 		e := Error{Code: http.StatusNotFound, Message: "balance not found"}
 		// TODO: wrap an error
-		_ = ctx.JSON(http.StatusNotFound, e)
+		err1 := ctx.JSON(http.StatusNotFound, e)
+		if err != nil {
+			b.logger.Error("error during sending error json", zap.Error(err1))
+		}
 		return nil
 	}
 	// convert
 	if params.Currency != nil && *params.Currency != "RUB" {
-		newAmount, err := b.converter.ConvertFromRUBToCurrency(balance.Amount, *params.Currency)
-		if err != nil {
+		newAmount, err1 := b.converter.ConvertFromRUBToCurrency(balance.Amount, *params.Currency)
+		if err1 != nil {
+			b.logger.Error("error during balance convert",
+				zap.Float32("amount", balance.Amount),
+				zap.String("currency", *params.Currency),
+				zap.Error(err1))
 			e := Error{
 				Code:    http.StatusBadRequest,
 				Message: fmt.Sprintf("something went wrong during convertation to %s", *params.Currency),
 			}
 			// TODO: wrap an error
-			_ = ctx.JSON(http.StatusNotFound, e)
+			err2 := ctx.JSON(http.StatusNotFound, e)
+			if err2 != nil {
+				b.logger.Error("error during sending error json", zap.Error(err2))
+			}
 			return err
 		}
 		balance.Amount = newAmount
