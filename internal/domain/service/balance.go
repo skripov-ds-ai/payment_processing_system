@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"math"
 	"payment_processing_system/internal/domain/entity"
 )
 
@@ -19,7 +20,7 @@ type BalanceService struct {
 	storage BalanceStorage
 }
 
-func (s BalanceService) GetByID(ctx context.Context, id string) (*entity.Balance, error) {
+func (s *BalanceService) GetByID(ctx context.Context, id string) (*entity.Balance, error) {
 	return s.storage.GetByID(ctx, id)
 }
 
@@ -27,8 +28,9 @@ func (s BalanceService) GetByID(ctx context.Context, id string) (*entity.Balance
 //	return s.storage.Create(ctx, balance)
 // }
 
-func (s BalanceService) ChangeAmount(ctx context.Context, id string, amount float32) error {
-	if amount == 0 {
+func (s *BalanceService) ChangeAmount(ctx context.Context, id string, amount float32) error {
+	// TODO: fix check is zero
+	if math.Abs(float64(amount)) < 1e-9 {
 		return fmt.Errorf("changing balance with id = %s by zero(amount = %f)", id, amount)
 	} else if amount > 0 {
 		return s.storage.IncreaseAmount(ctx, id, amount)
