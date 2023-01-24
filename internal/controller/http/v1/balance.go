@@ -30,9 +30,9 @@ type balanceHandler struct {
 
 func NewBalanceHandler(service BalanceService, converter Converter, logger *zap.Logger) *balanceHandler {
 	return &balanceHandler{
-		service: service,
+		service:   service,
 		converter: converter,
-		logger: logger,
+		logger:    logger,
 	}
 }
 

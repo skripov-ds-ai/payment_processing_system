@@ -24,7 +24,7 @@ func NewBalanceStorage(pool *pgxpool.Pool, logger *zap.Logger) *balanceStorage {
 		tableScheme:  tableScheme,
 		queryBuilder: sq.StatementBuilder.PlaceholderFormat(sq.Dollar),
 		pool:         pool,
-		logger: logger,
+		logger:       logger,
 	}
 }
 

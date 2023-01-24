@@ -19,6 +19,6 @@ func NewTransactionStorage(pool *pgxpool.Pool, logger *zap.Logger) *transactionS
 		tableScheme:  tableScheme,
 		queryBuilder: sq.StatementBuilder.PlaceholderFormat(sq.Dollar),
 		pool:         pool,
-		logger: logger,
+		logger:       logger,
 	}
 }
