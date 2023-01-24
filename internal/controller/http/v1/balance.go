@@ -28,6 +28,14 @@ type balanceHandler struct {
 	logger    *zap.Logger
 }
 
+func NewBalanceHandler(service BalanceService, converter Converter, logger *zap.Logger) *balanceHandler {
+	return &balanceHandler{
+		service: service,
+		converter: converter,
+		logger: logger,
+	}
+}
+
 // GetBalanceByID returns json of balance object or error
 // (GET /balances/{id})
 func (b *balanceHandler) GetBalanceByID(ctx echo.Context, id string, params GetBalanceByIdParams) error {

@@ -18,12 +18,13 @@ type balanceStorage struct {
 	logger       *zap.Logger
 }
 
-func NewBalanceStorage(pool *pgxpool.Pool) *balanceStorage {
+func NewBalanceStorage(pool *pgxpool.Pool, logger *zap.Logger) *balanceStorage {
 	tableScheme := "public.balance"
 	return &balanceStorage{
 		tableScheme:  tableScheme,
 		queryBuilder: sq.StatementBuilder.PlaceholderFormat(sq.Dollar),
 		pool:         pool,
+		logger: logger,
 	}
 }
 
