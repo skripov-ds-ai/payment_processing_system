@@ -32,6 +32,10 @@ func (t *TransactionService) CompletedByID(ctx context.Context, id string) error
 	return t.storage.UpdateStatusByID(ctx, id, entity.StatusCompleted)
 }
 
+func (t *TransactionService) ShouldRetryByID(ctx context.Context, id string) error {
+	return t.storage.UpdateStatusByID(ctx, id, entity.StatusShouldRetry)
+}
+
 func (t *TransactionService) CreateDefaultTransaction(ctx context.Context, sourceID, destinationID *string, amount float32, ttype entity.TransactionType) (string, error) {
 	now := time.Now()
 	transaction := entity.Transaction{

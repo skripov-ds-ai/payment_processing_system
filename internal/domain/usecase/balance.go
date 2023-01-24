@@ -18,6 +18,7 @@ type TransactionService interface {
 	CancelByID(ctx context.Context, id string) error
 	ProcessingByID(ctx context.Context, id string) error
 	CompletedByID(ctx context.Context, id string) error
+	ShouldRetryByID(ctx context.Context, id string) error
 }
 
 type BalanceUseCase struct {
@@ -45,7 +46,7 @@ func (buc *BalanceUseCase) ChangeAmount(ctx context.Context, id string, amount f
 	_ = buc.ts.ProcessingByID(ctx, transactionID)
 	err = buc.bs.ChangeAmount(ctx, id, amount)
 	if err != nil {
-		_ = buc.ts.CancelByID(ctx, id)
+		_ = buc.ts.ShouldRetryByID(ctx, id)
 		return err
 	}
 	_ = buc.ts.CompletedByID(ctx, id)
