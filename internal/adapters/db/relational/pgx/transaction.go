@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"payment_processing_system/internal/domain/entity"
+	"payment_processing_system/pkg/logger"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -14,10 +15,10 @@ type transactionStorage struct {
 	tableScheme  string
 	queryBuilder sq.StatementBuilderType
 	pool         *pgxpool.Pool
-	logger       *zap.Logger
+	logger       *logger.Logger
 }
 
-func NewTransactionStorage(pool *pgxpool.Pool, logger *zap.Logger) *transactionStorage {
+func NewTransactionStorage(pool *pgxpool.Pool, logger *logger.Logger) *transactionStorage {
 	tableScheme := "public.transaction"
 	return &transactionStorage{
 		tableScheme:  tableScheme,

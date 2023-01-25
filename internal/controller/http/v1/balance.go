@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"payment_processing_system/internal/domain/entity"
+	"payment_processing_system/pkg/logger"
 
 	"go.uber.org/zap"
 
@@ -25,10 +26,10 @@ type BalanceService interface {
 type balanceHandler struct {
 	service   BalanceService
 	converter Converter
-	logger    *zap.Logger
+	logger    *logger.Logger
 }
 
-func NewBalanceHandler(service BalanceService, converter Converter, logger *zap.Logger) *balanceHandler {
+func NewBalanceHandler(service BalanceService, converter Converter, logger *logger.Logger) *balanceHandler {
 	return &balanceHandler{
 		service:   service,
 		converter: converter,

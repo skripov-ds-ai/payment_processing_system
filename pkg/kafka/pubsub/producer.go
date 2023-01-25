@@ -2,9 +2,9 @@ package pubsub
 
 import (
 	"context"
+	"payment_processing_system/pkg/logger"
 
 	"github.com/segmentio/kafka-go"
-	"go.uber.org/zap"
 )
 
 type Producer interface {
@@ -13,17 +13,17 @@ type Producer interface {
 }
 
 type producer struct {
-	log     *zap.Logger
+	log     *logger.Logger
 	address []string
 	w       *kafka.Writer
 }
 
 // NewProducer create new kafka producer
-func NewProducer(address []string, log *zap.Logger) *producer {
-	// TODO: add Infof, Errorf to logger/logger interface
+func NewProducer(address []string, log *logger.Logger) *producer {
 	writer := kafka.Writer{
-		Addr: kafka.TCP(address...),
-		//Logger: kafka.Logger(),
+		Addr:        kafka.TCP(address...),
+		Logger:      kafka.LoggerFunc(log.Infof),
+		ErrorLogger: kafka.LoggerFunc(log.Errorf),
 	}
 	return &producer{log: log, address: address, w: &writer}
 }

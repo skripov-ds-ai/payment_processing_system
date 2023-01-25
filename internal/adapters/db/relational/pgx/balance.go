@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"payment_processing_system/internal/domain/entity"
+	"payment_processing_system/pkg/logger"
 
 	"go.uber.org/zap"
 
@@ -15,10 +16,10 @@ type balanceStorage struct {
 	tableScheme  string
 	queryBuilder sq.StatementBuilderType
 	pool         *pgxpool.Pool
-	logger       *zap.Logger
+	logger       *logger.Logger
 }
 
-func NewBalanceStorage(pool *pgxpool.Pool, logger *zap.Logger) *balanceStorage {
+func NewBalanceStorage(pool *pgxpool.Pool, logger *logger.Logger) *balanceStorage {
 	tableScheme := "public.balance"
 	return &balanceStorage{
 		tableScheme:  tableScheme,
