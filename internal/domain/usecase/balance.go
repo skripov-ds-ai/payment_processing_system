@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"fmt"
+	"github.com/segmentio/kafka-go"
 	"math"
 	"payment_processing_system/internal/domain/entity"
 )
@@ -22,9 +23,19 @@ type TransactionService interface {
 	CannotApplyByID(ctx context.Context, id string) error
 }
 
+type Producer interface {
+	PublishMessage(ctx context.Context, msgs ...kafka.Message) error
+	Close() error
+}
+
 type BalanceUseCase struct {
-	bs BalanceService
-	ts TransactionService
+	bs       BalanceService
+	ts       TransactionService
+	producer Producer
+}
+
+func NewBalanceUseCase(bs BalanceService, ts TransactionService, producer Producer) *BalanceUseCase {
+	return &BalanceUseCase{bs: bs, ts: ts, producer: producer}
 }
 
 func (buc *BalanceUseCase) ChangeAmount(ctx context.Context, id string, amount float32) error {
