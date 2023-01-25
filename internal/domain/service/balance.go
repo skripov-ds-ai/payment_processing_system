@@ -20,6 +20,10 @@ type BalanceService struct {
 	storage BalanceStorage
 }
 
+func NewBalanceService(storage BalanceStorage) *BalanceService {
+	return &BalanceService{storage: storage}
+}
+
 func (s *BalanceService) GetByID(ctx context.Context, id string) (*entity.Balance, error) {
 	return s.storage.GetByID(ctx, id)
 }
