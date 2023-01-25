@@ -32,6 +32,7 @@ func (suite *BalanceServiceTestSuite) TestGetByID_EqualIDNoError() {
 	actual, err := suite.service.GetByID(ctx, suite.id)
 	suite.Equal(expectedErr, err)
 	suite.Equal(expectedBalance.ID, actual.ID)
+	suite.Equal(expectedBalance, *actual)
 }
 
 func (suite *BalanceServiceTestSuite) TestChangeAmount_ByZeroErr() {
@@ -63,6 +64,6 @@ func (suite *BalanceServiceTestSuite) TestChangeAmount_DecreaseAmount() {
 	suite.Equal(expectedError, err)
 }
 
-func TestExampleTestSuite(t *testing.T) {
+func TestBalanceServiceTestSuite(t *testing.T) {
 	suite.Run(t, new(BalanceServiceTestSuite))
 }

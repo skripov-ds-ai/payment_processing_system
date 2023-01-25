@@ -16,6 +16,10 @@ type TransactionService struct {
 	storage TransactionStorage
 }
 
+func NewTransactionService(storage TransactionStorage) *TransactionService {
+	return &TransactionService{storage: storage}
+}
+
 func (t *TransactionService) GetByID(ctx context.Context, id string) (*entity.Transaction, error) {
 	return t.storage.GetByID(ctx, id)
 }
