@@ -3,9 +3,10 @@ package usecase
 import (
 	"context"
 	"fmt"
-	"github.com/segmentio/kafka-go"
 	"math"
 	"payment_processing_system/internal/domain/entity"
+
+	"github.com/segmentio/kafka-go"
 )
 
 type BalanceService interface {
