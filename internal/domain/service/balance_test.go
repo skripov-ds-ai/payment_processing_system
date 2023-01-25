@@ -13,24 +13,54 @@ type BalanceServiceTestSuite struct {
 	suite.Suite
 	service *BalanceService
 	storage *mock.BalanceStorage
+	id      string
 }
 
 func (suite *BalanceServiceTestSuite) SetupTest() {
 	suite.storage = &mock.BalanceStorage{}
 	suite.service = NewBalanceService(suite.storage)
+	suite.id = "example"
 }
 
 func (suite *BalanceServiceTestSuite) TestGetByID_EqualIDNoError() {
 	ctx := context.Background()
-	id := "example"
 	var expectedErr error
-	var expectedBalance = entity.Balance{ID: id}
-	suite.storage.On("GetByID", ctx, id).
+	var expectedBalance = entity.Balance{ID: suite.id}
+	suite.storage.On("GetByID", ctx, suite.id).
 		Return(&expectedBalance, expectedErr).
 		Once()
-	actual, err := suite.service.GetByID(ctx, id)
+	actual, err := suite.service.GetByID(ctx, suite.id)
 	suite.Equal(expectedErr, err)
 	suite.Equal(expectedBalance.ID, actual.ID)
+}
+
+func (suite *BalanceServiceTestSuite) TestChangeAmount_ByZeroErr() {
+	ctx := context.Background()
+	var amount float32 = 0
+	err := suite.service.ChangeAmount(ctx, suite.id, amount)
+	suite.ErrorIsf(err, ChangeBalanceByZeroAmountErr, "id = %q ; amount = %f ; %w", suite.id, amount, ChangeBalanceByZeroAmountErr)
+}
+
+func (suite *BalanceServiceTestSuite) TestChangeAmount_IncreaseAmount() {
+	ctx := context.Background()
+	var amount float32 = 1
+	var expectedError error
+	suite.storage.On("IncreaseAmount", ctx, suite.id, amount).
+		Return(expectedError).
+		Once()
+	err := suite.service.ChangeAmount(ctx, suite.id, amount)
+	suite.Equal(expectedError, err)
+}
+
+func (suite *BalanceServiceTestSuite) TestChangeAmount_DecreaseAmount() {
+	ctx := context.Background()
+	var amount float32 = -1
+	var expectedError error
+	suite.storage.On("DecreaseAmount", ctx, suite.id, -amount).
+		Return(expectedError).
+		Once()
+	err := suite.service.ChangeAmount(ctx, suite.id, amount)
+	suite.Equal(expectedError, err)
 }
 
 func TestExampleTestSuite(t *testing.T) {

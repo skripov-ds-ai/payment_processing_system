@@ -35,7 +35,7 @@ func (s *BalanceService) GetByID(ctx context.Context, id string) (*entity.Balanc
 func (s *BalanceService) ChangeAmount(ctx context.Context, id string, amount float32) error {
 	// TODO: fix check is zero
 	if math.Abs(float64(amount)) < 1e-9 {
-		return fmt.Errorf("changing balance with id = %s by zero(amount = %f)", id, amount)
+		return fmt.Errorf("id = %q ; amount = %f ; %w", id, amount, ChangeBalanceByZeroAmountErr)
 	} else if amount > 0 {
 		return s.storage.IncreaseAmount(ctx, id, amount)
 	}
