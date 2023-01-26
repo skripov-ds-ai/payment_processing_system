@@ -45,6 +45,23 @@ func (suite *BalanceUseCaseTestSuite) TestChangeAmount_OuterIncreasingNoError() 
 	err := suite.useCase.ChangeAmount(ctx, &suite.idTo, amount)
 	suite.Equal(expectedErr, err)
 }
+func (suite *BalanceUseCaseTestSuite) TestChangeAmount_OuterDecreasingNoError() {
+	ctx := context.Background()
+	var amount float32 = -10.3
+	var expectedErr error
+	var idToPtr *string
+	suite.ts.On("CreateDefaultTransaction", ctx, &suite.idFrom,
+		idToPtr, -amount, entity.TypeOuterDecreasing).
+		Return(suite.transactionID, expectedErr).Once()
+	suite.ts.On("ProcessingByID",
+		ctx, suite.transactionID).Return(expectedErr).Once()
+	suite.bs.On("ChangeAmount",
+		ctx, suite.idFrom, amount).Return(expectedErr).Once()
+	suite.ts.On("CompletedByID",
+		ctx, suite.transactionID).Return(expectedErr).Once()
+	err := suite.useCase.ChangeAmount(ctx, &suite.idFrom, amount)
+	suite.Equal(expectedErr, err)
+}
 
 func (suite *BalanceUseCaseTestSuite) TestTransfer_TransferNoError() {
 	ctx := context.Background()
