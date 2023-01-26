@@ -31,9 +31,6 @@ func (suite *BalanceUseCaseTestSuite) SetupTest() {
 func (suite *BalanceUseCaseTestSuite) TestChangeAmount_OuterIncreasingNoError() {
 	ctx := context.Background()
 	var amount float32 = 1.3
-	// suite.storage.On("DecreaseAmount", ctx, suite.id, -amount).
-	//	Return(expectedError).
-	//	Once()
 	var expectedErr error
 	var idFromPtr *string
 	suite.ts.On("CreateDefaultTransaction", ctx, idFromPtr,
@@ -46,6 +43,28 @@ func (suite *BalanceUseCaseTestSuite) TestChangeAmount_OuterIncreasingNoError() 
 	suite.ts.On("CompletedByID",
 		ctx, suite.transactionID).Return(expectedErr).Once()
 	err := suite.useCase.ChangeAmount(ctx, &suite.idTo, amount)
+	suite.Equal(expectedErr, err)
+}
+
+func (suite *BalanceUseCaseTestSuite) TestTransfer_TransferNoError() {
+	ctx := context.Background()
+	var amount float32 = 1.3
+	var expectedErr error
+	var entityBalancePtr *entity.Balance
+	suite.bs.On("GetByID", ctx, suite.idFrom).
+		Return(entityBalancePtr, expectedErr).Once()
+	suite.ts.On("CreateDefaultTransaction", ctx, &suite.idFrom,
+		&suite.idTo, amount, entity.TypeTransfer).
+		Return(suite.transactionID, expectedErr).Once()
+	suite.ts.On("ProcessingByID",
+		ctx, suite.transactionID).Return(expectedErr).Once()
+	suite.bs.On("ChangeAmount",
+		ctx, suite.idTo, amount).Return(expectedErr).Once()
+	suite.bs.On("ChangeAmount",
+		ctx, suite.idFrom, -amount).Return(expectedErr).Once()
+	suite.ts.On("CompletedByID",
+		ctx, suite.transactionID).Return(expectedErr).Once()
+	err := suite.useCase.Transfer(ctx, &suite.idFrom, &suite.idTo, amount)
 	suite.Equal(expectedErr, err)
 }
 
