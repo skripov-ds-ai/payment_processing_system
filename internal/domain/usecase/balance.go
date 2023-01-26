@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"payment_processing_system/internal/domain"
 	"payment_processing_system/internal/domain/entity"
-	"payment_processing_system/internal/domain/service"
 	"payment_processing_system/internal/utils"
 
 	"go.uber.org/multierr"
@@ -37,7 +37,7 @@ func NewBalanceUseCase(bs BalanceService, ts TransactionService) *BalanceUseCase
 
 func (buc *BalanceUseCase) ChangeAmount(ctx context.Context, id string, amount float32) error {
 	if utils.IsZero(amount) {
-		return fmt.Errorf("id = %q ; amount = %f ; %w", id, amount, service.ChangeBalanceByZeroAmountErr)
+		return fmt.Errorf("id = %q ; amount = %f ; %w", id, amount, domain.ChangeBalanceByZeroAmountErr)
 	}
 	var transactionID string
 	var err error
@@ -63,7 +63,7 @@ func (buc *BalanceUseCase) ChangeAmount(ctx context.Context, id string, amount f
 	err = buc.bs.ChangeAmount(ctx, id, amount)
 	if err != nil {
 		// Change balance by -amount on err
-		if errors.Is(err, entity.BalanceWasNotDecreased) || errors.Is(err, entity.BalanceWasNotIncreased) {
+		if errors.Is(err, domain.BalanceWasNotDecreased) || errors.Is(err, domain.BalanceWasNotIncreased) {
 			multierr.AppendInto(&err, buc.bs.ChangeAmount(ctx, id, -amount))
 		}
 		// Cancel transaction on err

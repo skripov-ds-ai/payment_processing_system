@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"payment_processing_system/internal/domain"
 	"payment_processing_system/internal/domain/entity"
 	"payment_processing_system/internal/domain/service/mock"
 	"testing"
@@ -39,7 +40,7 @@ func (suite *BalanceServiceTestSuite) TestChangeAmount_ByZeroErr() {
 	ctx := context.Background()
 	var amount float32 = 0
 	err := suite.service.ChangeAmount(ctx, suite.id, amount)
-	suite.ErrorIsf(err, ChangeBalanceByZeroAmountErr, "id = %q ; amount = %f ; %w", suite.id, amount, ChangeBalanceByZeroAmountErr)
+	suite.ErrorIsf(err, domain.ChangeBalanceByZeroAmountErr, "id = %q ; amount = %f ; %w", suite.id, amount, domain.ChangeBalanceByZeroAmountErr)
 }
 
 func (suite *BalanceServiceTestSuite) TestChangeAmount_IncreaseAmount() {

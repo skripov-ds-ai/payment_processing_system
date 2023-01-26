@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"payment_processing_system/internal/domain"
 	"payment_processing_system/internal/domain/entity"
 	"payment_processing_system/internal/utils"
 	"time"
@@ -47,13 +48,13 @@ func (t *TransactionService) CannotApplyByID(ctx context.Context, id string) err
 
 func (t *TransactionService) CreateDefaultTransaction(ctx context.Context, sourceID, destinationID *string, amount float32, ttype entity.TransactionType) (string, error) {
 	if utils.IsZero(amount) {
-		return "", ZeroAmountTransactionErr
+		return "", domain.ZeroAmountTransactionErr
 	}
 	if sourceID == nil && destinationID == nil {
-		return "", TransactionNilSourceDestinationErr
+		return "", domain.TransactionNilSourceDestinationErr
 	}
 	if sourceID == destinationID || sourceID != nil && destinationID != nil && *sourceID == *destinationID {
-		return "", TransactionSourceDestinationAreEqualErr
+		return "", domain.TransactionSourceDestinationAreEqualErr
 	}
 	now := time.Now()
 	transaction := entity.Transaction{
