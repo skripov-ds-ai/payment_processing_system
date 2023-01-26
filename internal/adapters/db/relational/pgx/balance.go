@@ -39,16 +39,12 @@ func (bs *balanceStorage) IncreaseAmount(ctx context.Context, id string, amount 
 		zap.String("sql", sql),
 		zap.String("args", fmt.Sprintf("%v", args)))
 	if buildErr != nil {
-		// TODO: add wrapping
-		// buildErr
 		return buildErr
 	}
 	if exec, execErr := bs.pool.Exec(ctx, sql, args...); execErr != nil {
-		// TODO: wrap
 		return execErr
 	} else if exec.RowsAffected() == 0 || !exec.Insert() {
-		// TODO: create err
-		return fmt.Errorf("balance was not increased")
+		return entity.BalanceWasNotIncreased
 	}
 	return nil
 }
@@ -63,16 +59,12 @@ func (bs *balanceStorage) DecreaseAmount(ctx context.Context, id string, amount 
 		zap.String("sql", sql),
 		zap.String("args", fmt.Sprintf("%v", args)))
 	if buildErr != nil {
-		// TODO: add wrapping
-		// buildErr
 		return buildErr
 	}
 	if exec, execErr := bs.pool.Exec(ctx, sql, args...); execErr != nil {
-		// TODO: wrap
 		return execErr
 	} else if exec.RowsAffected() == 0 || !exec.Insert() {
-		// TODO: create err
-		return fmt.Errorf("balance was not decreased")
+		return entity.BalanceWasNotDecreased
 	}
 	return nil
 }
@@ -86,8 +78,6 @@ func (bs *balanceStorage) GetByID(ctx context.Context, id string) (*entity.Balan
 		zap.String("sql", sql),
 		zap.String("args", fmt.Sprintf("%v", args)))
 	if buildErr != nil {
-		// TODO: add wrapping
-		// buildErr
 		return nil, buildErr
 	}
 	var obj entity.Balance
@@ -95,9 +85,7 @@ func (bs *balanceStorage) GetByID(ctx context.Context, id string) (*entity.Balan
 		&obj.ID,
 		&obj.Amount)
 	if err != nil {
-		// TODO: wrap error
 		return nil, err
 	}
-	// bs.pool.Query()
 	return &obj, nil
 }

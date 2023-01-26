@@ -2,11 +2,13 @@ package usecase
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"math"
 	"payment_processing_system/internal/domain/entity"
+	"payment_processing_system/internal/domain/service"
+	"payment_processing_system/internal/utils"
 
-	"github.com/segmentio/kafka-go"
+	"go.uber.org/multierr"
 )
 
 type BalanceService interface {
@@ -24,44 +26,58 @@ type TransactionService interface {
 	CannotApplyByID(ctx context.Context, id string) error
 }
 
-type Producer interface {
-	PublishMessage(ctx context.Context, msgs ...kafka.Message) error
-	Close() error
-}
-
 type BalanceUseCase struct {
-	bs       BalanceService
-	ts       TransactionService
-	producer Producer
+	bs BalanceService
+	ts TransactionService
 }
 
-func NewBalanceUseCase(bs BalanceService, ts TransactionService, producer Producer) *BalanceUseCase {
-	return &BalanceUseCase{bs: bs, ts: ts, producer: producer}
+func NewBalanceUseCase(bs BalanceService, ts TransactionService) *BalanceUseCase {
+	return &BalanceUseCase{bs: bs, ts: ts}
 }
 
 func (buc *BalanceUseCase) ChangeAmount(ctx context.Context, id string, amount float32) error {
-	if math.Abs(float64(amount)) < 1e-9 {
-		return fmt.Errorf("changing balance with id = %s by zero(amount = %f)", id, amount)
+	if utils.IsZero(amount) {
+		return fmt.Errorf("id = %q ; amount = %f ; %w", id, amount, service.ChangeBalanceByZeroAmountErr)
 	}
-	// TODO: change logic!
 	var transactionID string
 	var err error
+	// Create transaction
 	if amount > 0 {
 		transactionID, err = buc.ts.CreateDefaultTransaction(ctx, nil, &id, amount, entity.TypeOuterIncreasing)
 	} else {
 		transactionID, err = buc.ts.CreateDefaultTransaction(ctx, &id, nil, -amount, entity.TypeOuterDecreasing)
 	}
+	// Cancel transaction on err
 	if err != nil {
-		// TODO: wrap err
-		_ = buc.ts.CancelByID(ctx, transactionID)
+		multierr.AppendInto(&err, buc.ts.CancelByID(ctx, transactionID))
 		return err
 	}
-	_ = buc.ts.ProcessingByID(ctx, transactionID)
+	// Change transaction status to "processing"
+	err = buc.ts.ProcessingByID(ctx, transactionID)
+	// Cancel transaction on err
+	if err != nil {
+		multierr.AppendInto(&err, buc.ts.CancelByID(ctx, transactionID))
+		return err
+	}
+	// Change balance by amount
 	err = buc.bs.ChangeAmount(ctx, id, amount)
 	if err != nil {
-		_ = buc.ts.ShouldRetryByID(ctx, id)
+		// Change balance by -amount on err
+		if errors.Is(err, entity.BalanceWasNotDecreased) || errors.Is(err, entity.BalanceWasNotIncreased) {
+			multierr.AppendInto(&err, buc.bs.ChangeAmount(ctx, id, -amount))
+		}
+		// Cancel transaction on err
+		multierr.AppendInto(&err, buc.ts.CancelByID(ctx, id))
 		return err
 	}
-	_ = buc.ts.CompletedByID(ctx, id)
+	// Change transaction status to "completed"
+	err = buc.ts.CompletedByID(ctx, id)
+	if err != nil {
+		// Change balance by -amount on err
+		multierr.AppendInto(&err, buc.bs.ChangeAmount(ctx, id, -amount))
+		// Cancel transaction on err
+		multierr.AppendInto(&err, buc.ts.CancelByID(ctx, transactionID))
+		return err
+	}
 	return nil
 }

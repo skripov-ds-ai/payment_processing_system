@@ -3,8 +3,8 @@ package service
 import (
 	"context"
 	"fmt"
-	"math"
 	"payment_processing_system/internal/domain/entity"
+	"payment_processing_system/internal/utils"
 )
 
 type BalanceStorage interface {
@@ -34,7 +34,7 @@ func (s *BalanceService) GetByID(ctx context.Context, id string) (*entity.Balanc
 
 func (s *BalanceService) ChangeAmount(ctx context.Context, id string, amount float32) error {
 	// TODO: fix check is zero
-	if math.Abs(float64(amount)) < 1e-9 {
+	if utils.IsZero(amount) {
 		return fmt.Errorf("id = %q ; amount = %f ; %w", id, amount, ChangeBalanceByZeroAmountErr)
 	} else if amount > 0 {
 		return s.storage.IncreaseAmount(ctx, id, amount)
