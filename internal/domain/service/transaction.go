@@ -51,7 +51,7 @@ func (t *TransactionService) CreateDefaultTransaction(ctx context.Context, sourc
 		return "", domain.ZeroAmountTransactionErr
 	}
 	if sourceID == nil && destinationID == nil {
-		return "", domain.TransactionNilSourceDestinationErr
+		return "", domain.TransactionNilSourceAndDestinationErr
 	}
 	if sourceID == destinationID || sourceID != nil && destinationID != nil && *sourceID == *destinationID {
 		return "", domain.TransactionSourceDestinationAreEqualErr

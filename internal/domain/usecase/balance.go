@@ -35,24 +35,30 @@ func NewBalanceUseCase(bs BalanceService, ts TransactionService) *BalanceUseCase
 	return &BalanceUseCase{bs: bs, ts: ts}
 }
 
-func (buc *BalanceUseCase) Transfer(ctx context.Context, idFrom, idTo string, amount float32) error {
+func (buc *BalanceUseCase) Transfer(ctx context.Context, idFrom, idTo *string, amount float32) error {
+	if idFrom == nil {
+		return domain.TransactionNilSourceErr
+	}
+	if idTo == nil {
+		return domain.TransactionNilDestinationErr
+	}
 	if utils.IsZero(amount) {
-		return fmt.Errorf("idFrom = %q ; idTo = %q ; amount = %f ; %w", idFrom, idTo, amount, domain.ChangeBalanceByZeroAmountErr)
+		return fmt.Errorf("idFrom = %q ; idTo = %q ; amount = %f ; %w", *idFrom, *idTo, amount, domain.ChangeBalanceByZeroAmountErr)
 	}
 	if amount < 0 {
-		return fmt.Errorf("idFrom = %q ; idTo = %q ; amount = %f ; %w", idFrom, idTo, amount, domain.NegativeAmountTransactionErr)
+		return fmt.Errorf("idFrom = %q ; idTo = %q ; amount = %f ; %w", *idFrom, *idTo, amount, domain.NegativeAmountTransactionErr)
 	}
-	if idFrom == idTo {
-		return fmt.Errorf("idFrom = %q ; idTo = %q ; %w", domain.TransactionSourceDestinationAreEqualErr)
+	if *idFrom == *idTo {
+		return fmt.Errorf("idFrom = %q ; idTo = %q ; %w", *idFrom, *idTo, domain.TransactionSourceDestinationAreEqualErr)
 	}
 	// Check existence of idFrom balance
-	_, err := buc.bs.GetByID(ctx, idFrom)
+	_, err := buc.bs.GetByID(ctx, *idFrom)
 	if err != nil {
 		return err
 	}
 	var transactionID string
 	// Create transaction
-	transactionID, err = buc.ts.CreateDefaultTransaction(ctx, &idFrom, &idTo, amount, entity.TypeTransfer)
+	transactionID, err = buc.ts.CreateDefaultTransaction(ctx, idFrom, idTo, amount, entity.TypeTransfer)
 	// Cancel transaction on err
 	if err != nil {
 		multierr.AppendInto(&err, buc.ts.CancelByID(ctx, transactionID))
@@ -66,40 +72,40 @@ func (buc *BalanceUseCase) Transfer(ctx context.Context, idFrom, idTo string, am
 		return err
 	}
 	// Change balance by amount
-	err = buc.bs.ChangeAmount(ctx, idTo, amount)
+	err = buc.bs.ChangeAmount(ctx, *idTo, amount)
 	if err != nil {
 		// Change balance by -amount on err
 		if errors.Is(err, domain.BalanceWasNotIncreased) {
-			multierr.AppendInto(&err, buc.bs.ChangeAmount(ctx, idTo, -amount))
+			multierr.AppendInto(&err, buc.bs.ChangeAmount(ctx, *idTo, -amount))
 		}
 		// Cancel transaction on err
 		multierr.AppendInto(&err, buc.ts.CancelByID(ctx, transactionID))
 		return err
 	}
-	err = buc.bs.ChangeAmount(ctx, idFrom, -amount)
+	err = buc.bs.ChangeAmount(ctx, *idFrom, -amount)
 	if err != nil {
 		// Change balance by amount on err
 		if errors.Is(err, domain.BalanceWasNotDecreased) {
-			multierr.AppendInto(&err, buc.bs.ChangeAmount(ctx, idFrom, amount))
+			multierr.AppendInto(&err, buc.bs.ChangeAmount(ctx, *idFrom, amount))
 		}
 		// Change balance by -amount on err
 		if errors.Is(err, domain.BalanceWasNotIncreased) {
-			multierr.AppendInto(&err, buc.bs.ChangeAmount(ctx, idTo, -amount))
+			multierr.AppendInto(&err, buc.bs.ChangeAmount(ctx, *idTo, -amount))
 		}
 		// Cancel transaction on err
 		multierr.AppendInto(&err, buc.ts.CancelByID(ctx, transactionID))
 		return err
 	}
 	// Change transaction status to "completed"
-	err = buc.ts.CompletedByID(ctx, idTo)
+	err = buc.ts.CompletedByID(ctx, transactionID)
 	if err != nil {
 		// Change balance by amount on err
 		if errors.Is(err, domain.BalanceWasNotDecreased) {
-			multierr.AppendInto(&err, buc.bs.ChangeAmount(ctx, idFrom, amount))
+			multierr.AppendInto(&err, buc.bs.ChangeAmount(ctx, *idFrom, amount))
 		}
 		// Change balance by -amount on err
 		if errors.Is(err, domain.BalanceWasNotIncreased) {
-			multierr.AppendInto(&err, buc.bs.ChangeAmount(ctx, idTo, -amount))
+			multierr.AppendInto(&err, buc.bs.ChangeAmount(ctx, *idTo, -amount))
 		}
 		// Cancel transaction on err
 		multierr.AppendInto(&err, buc.ts.CancelByID(ctx, transactionID))
@@ -108,17 +114,20 @@ func (buc *BalanceUseCase) Transfer(ctx context.Context, idFrom, idTo string, am
 	return nil
 }
 
-func (buc *BalanceUseCase) ChangeAmount(ctx context.Context, id string, amount float32) error {
+func (buc *BalanceUseCase) ChangeAmount(ctx context.Context, id *string, amount float32) error {
+	if id == nil {
+		return domain.TransactionNilSourceOrDestinationErr
+	}
 	if utils.IsZero(amount) {
-		return fmt.Errorf("id = %q ; amount = %f ; %w", id, amount, domain.ChangeBalanceByZeroAmountErr)
+		return fmt.Errorf("id = %q ; amount = %f ; %w", *id, amount, domain.ChangeBalanceByZeroAmountErr)
 	}
 	var transactionID string
 	var err error
 	// Create transaction
 	if amount > 0 {
-		transactionID, err = buc.ts.CreateDefaultTransaction(ctx, nil, &id, amount, entity.TypeOuterIncreasing)
+		transactionID, err = buc.ts.CreateDefaultTransaction(ctx, nil, id, amount, entity.TypeOuterIncreasing)
 	} else {
-		transactionID, err = buc.ts.CreateDefaultTransaction(ctx, &id, nil, -amount, entity.TypeOuterDecreasing)
+		transactionID, err = buc.ts.CreateDefaultTransaction(ctx, id, nil, -amount, entity.TypeOuterDecreasing)
 	}
 	// Cancel transaction on err
 	if err != nil {
@@ -133,21 +142,21 @@ func (buc *BalanceUseCase) ChangeAmount(ctx context.Context, id string, amount f
 		return err
 	}
 	// Change balance by amount
-	err = buc.bs.ChangeAmount(ctx, id, amount)
+	err = buc.bs.ChangeAmount(ctx, *id, amount)
 	if err != nil {
 		// Change balance by -amount on err
 		if errors.Is(err, domain.BalanceWasNotDecreased) || errors.Is(err, domain.BalanceWasNotIncreased) {
-			multierr.AppendInto(&err, buc.bs.ChangeAmount(ctx, id, -amount))
+			multierr.AppendInto(&err, buc.bs.ChangeAmount(ctx, *id, -amount))
 		}
 		// Cancel transaction on err
 		multierr.AppendInto(&err, buc.ts.CancelByID(ctx, transactionID))
 		return err
 	}
 	// Change transaction status to "completed"
-	err = buc.ts.CompletedByID(ctx, id)
+	err = buc.ts.CompletedByID(ctx, transactionID)
 	if err != nil {
 		// Change balance by -amount on err
-		multierr.AppendInto(&err, buc.bs.ChangeAmount(ctx, id, -amount))
+		multierr.AppendInto(&err, buc.bs.ChangeAmount(ctx, *id, -amount))
 		// Cancel transaction on err
 		multierr.AppendInto(&err, buc.ts.CancelByID(ctx, transactionID))
 		return err
@@ -155,21 +164,24 @@ func (buc *BalanceUseCase) ChangeAmount(ctx context.Context, id string, amount f
 	return nil
 }
 
-func (buc *BalanceUseCase) PayForService(ctx context.Context, id string, amount float32) error {
+func (buc *BalanceUseCase) PayForService(ctx context.Context, id *string, amount float32) error {
+	if id == nil {
+		return domain.TransactionNilSourceErr
+	}
 	if utils.IsZero(amount) {
-		return fmt.Errorf("id = %q ; amount = %f ; %w", id, amount, domain.ChangeBalanceByZeroAmountErr)
+		return fmt.Errorf("id = %q ; amount = %f ; %w", *id, amount, domain.ChangeBalanceByZeroAmountErr)
 	}
 	if amount < 0 {
-		return fmt.Errorf("id = %q ; amount = %f ; %w", id, amount, domain.NegativeAmountTransactionErr)
+		return fmt.Errorf("id = %q ; amount = %f ; %w", *id, amount, domain.NegativeAmountTransactionErr)
 	}
 	// Check existence of id balance
-	_, err := buc.bs.GetByID(ctx, id)
+	_, err := buc.bs.GetByID(ctx, *id)
 	if err != nil {
 		return err
 	}
 	var transactionID string
 	// Create transaction
-	transactionID, err = buc.ts.CreateDefaultTransaction(ctx, &id, nil, -amount, entity.TypePayment)
+	transactionID, err = buc.ts.CreateDefaultTransaction(ctx, id, nil, -amount, entity.TypePayment)
 	// Cancel transaction on err
 	if err != nil {
 		multierr.AppendInto(&err, buc.ts.CancelByID(ctx, transactionID))
@@ -183,21 +195,21 @@ func (buc *BalanceUseCase) PayForService(ctx context.Context, id string, amount 
 		return err
 	}
 	// Change balance by -amount
-	err = buc.bs.ChangeAmount(ctx, id, -amount)
+	err = buc.bs.ChangeAmount(ctx, *id, -amount)
 	if err != nil {
 		// Change balance by amount on err
 		if errors.Is(err, domain.BalanceWasNotDecreased) {
-			multierr.AppendInto(&err, buc.bs.ChangeAmount(ctx, id, amount))
+			multierr.AppendInto(&err, buc.bs.ChangeAmount(ctx, *id, amount))
 		}
 		// Cancel transaction on err
 		multierr.AppendInto(&err, buc.ts.CancelByID(ctx, transactionID))
 		return err
 	}
 	// Change transaction status to "completed"
-	err = buc.ts.CompletedByID(ctx, id)
+	err = buc.ts.CompletedByID(ctx, transactionID)
 	if err != nil {
 		// Change balance by amount on err
-		multierr.AppendInto(&err, buc.bs.ChangeAmount(ctx, id, amount))
+		multierr.AppendInto(&err, buc.bs.ChangeAmount(ctx, *id, amount))
 		// Cancel transaction on err
 		multierr.AppendInto(&err, buc.ts.CancelByID(ctx, transactionID))
 		return err
