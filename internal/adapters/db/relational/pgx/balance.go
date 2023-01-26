@@ -3,6 +3,7 @@ package pgx
 import (
 	"context"
 	"fmt"
+	"payment_processing_system/internal/domain"
 	"payment_processing_system/internal/domain/entity"
 	"payment_processing_system/pkg/logger"
 
@@ -44,7 +45,7 @@ func (bs *balanceStorage) IncreaseAmount(ctx context.Context, id string, amount 
 	if exec, execErr := bs.pool.Exec(ctx, sql, args...); execErr != nil {
 		return execErr
 	} else if exec.RowsAffected() == 0 || !exec.Insert() {
-		return entity.BalanceWasNotIncreased
+		return domain.BalanceWasNotIncreased
 	}
 	return nil
 }
@@ -64,7 +65,7 @@ func (bs *balanceStorage) DecreaseAmount(ctx context.Context, id string, amount 
 	if exec, execErr := bs.pool.Exec(ctx, sql, args...); execErr != nil {
 		return execErr
 	} else if exec.RowsAffected() == 0 || !exec.Insert() {
-		return entity.BalanceWasNotDecreased
+		return domain.BalanceWasNotDecreased
 	}
 	return nil
 }

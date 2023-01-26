@@ -2,19 +2,14 @@ package domain
 
 import (
 	"errors"
-	"fmt"
 )
 
 var (
-	BalanceWasNotIncreased = fmt.Errorf("balance was not increased")
-	BalanceWasNotDecreased = fmt.Errorf("balance was not decreased")
-)
-
-var TransactionSourceDestinationAreEqualErr = errors.New("source and destination of transaction are equal")
-
-var (
-	ChangeBalanceByZeroAmountErr = errors.New("changing balance by zero amount")
-
-	TransactionNilSourceDestinationErr = errors.New("source and destination of transaction are nil")
-	ZeroAmountTransactionErr           = errors.New("transaction amount is zero")
+	BalanceWasNotIncreased                  = errors.New("balance was not increased")
+	BalanceWasNotDecreased                  = errors.New("balance was not decreased")
+	ChangeBalanceByZeroAmountErr            = errors.New("changing balance by zero amount")
+	TransactionSourceDestinationAreEqualErr = errors.New("source and destination of transaction are equal")
+	TransactionNilSourceDestinationErr      = errors.New("source and destination of transaction are nil")
+	ZeroAmountTransactionErr                = errors.New("transaction amount is zero")
+	NegativeAmountTransactionErr            = errors.New("transaction amount is negative")
 )
