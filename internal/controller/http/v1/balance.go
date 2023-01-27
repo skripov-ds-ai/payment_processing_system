@@ -16,21 +16,23 @@ type Converter interface {
 	ConvertFromRUBToCurrency(amount float32, currency string) (float32, error)
 }
 
-// BalanceService is standard service for balance
-type BalanceService interface {
+// BalanceService is standard useCase for balance
+type BalanceUseCase interface {
 	GetByID(ctx context.Context, id string) (*entity.Balance, error)
-	ChangeAmount(ctx context.Context, id string, amount float32) error
+	ChangeAmount(ctx context.Context, id *string, amount float32) error
+	PayForService(ctx context.Context, id *string, amount float32) error
+	Transfer(ctx context.Context, idFrom, idTo *string, amount float32) error
 }
 
 type balanceHandler struct {
-	service   BalanceService
+	useCase   BalanceUseCase
 	converter Converter
 	logger    *logger.Logger
 }
 
-func NewBalanceHandler(service BalanceService, converter Converter, logger *logger.Logger) *balanceHandler {
+func NewBalanceHandler(useCase BalanceUseCase, converter Converter, logger *logger.Logger) *balanceHandler {
 	return &balanceHandler{
-		service:   service,
+		useCase:   useCase,
 		converter: converter,
 		logger:    logger,
 	}
@@ -39,7 +41,7 @@ func NewBalanceHandler(service BalanceService, converter Converter, logger *logg
 // GetBalanceByID returns json of balance object or error
 // (GET /balances/{id})
 func (b *balanceHandler) GetBalanceByID(ctx echo.Context, id string, params GetBalanceByIdParams) error {
-	balance, err := b.service.GetByID(ctx.Request().Context(), id)
+	balance, err := b.useCase.GetByID(ctx.Request().Context(), id)
 	if err != nil {
 		b.logger.Error("error during getting balance", zap.String("id", id), zap.Error(err))
 		e := Error{
