@@ -43,13 +43,13 @@ func (buc *BalanceUseCase) Transfer(ctx context.Context, idFrom, idTo *string, a
 		return domain.TransactionNilDestinationErr
 	}
 	if utils.IsZero(amount) {
-		return fmt.Errorf("idFrom = %q ; idTo = %q ; amount = %f ; %w", *idFrom, *idTo, amount, domain.ChangeBalanceByZeroAmountErr)
+		return fmt.Errorf("idFrom = %q ; id = %q ; amount = %f ; %w", *idFrom, *idTo, amount, domain.ChangeBalanceByZeroAmountErr)
 	}
 	if amount < 0 {
-		return fmt.Errorf("idFrom = %q ; idTo = %q ; amount = %f ; %w", *idFrom, *idTo, amount, domain.NegativeAmountTransactionErr)
+		return fmt.Errorf("idFrom = %q ; id = %q ; amount = %f ; %w", *idFrom, *idTo, amount, domain.NegativeAmountTransactionErr)
 	}
 	if *idFrom == *idTo {
-		return fmt.Errorf("idFrom = %q ; idTo = %q ; %w", *idFrom, *idTo, domain.TransactionSourceDestinationAreEqualErr)
+		return fmt.Errorf("idFrom = %q ; id = %q ; %w", *idFrom, *idTo, domain.TransactionSourceDestinationAreEqualErr)
 	}
 	// Check existence of idFrom balance
 	_, err := buc.bs.GetByID(ctx, *idFrom)

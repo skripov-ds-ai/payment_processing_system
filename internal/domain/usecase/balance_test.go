@@ -28,39 +28,60 @@ func (suite *BalanceUseCaseTestSuite) SetupTest() {
 	suite.transactionID = "transaction-1"
 }
 
-func (suite *BalanceUseCaseTestSuite) TestChangeAmount_OuterIncreasingNoError() {
-	ctx := context.Background()
-	var amount float32 = 1.3
-	var expectedErr error
-	var idFromPtr *string
-	suite.ts.On("CreateDefaultTransaction", ctx, idFromPtr,
-		&suite.idTo, amount, entity.TypeOuterIncreasing).
-		Return(suite.transactionID, expectedErr).Once()
-	suite.ts.On("ProcessingByID",
-		ctx, suite.transactionID).Return(expectedErr).Once()
-	suite.bs.On("ChangeAmount",
-		ctx, suite.idTo, amount).Return(expectedErr).Once()
-	suite.ts.On("CompletedByID",
-		ctx, suite.transactionID).Return(expectedErr).Once()
-	err := suite.useCase.ChangeAmount(ctx, &suite.idTo, amount)
-	suite.Equal(expectedErr, err)
-}
-func (suite *BalanceUseCaseTestSuite) TestChangeAmount_OuterDecreasingNoError() {
-	ctx := context.Background()
-	var amount float32 = -10.3
-	var expectedErr error
-	var idToPtr *string
-	suite.ts.On("CreateDefaultTransaction", ctx, &suite.idFrom,
-		idToPtr, -amount, entity.TypeOuterDecreasing).
-		Return(suite.transactionID, expectedErr).Once()
-	suite.ts.On("ProcessingByID",
-		ctx, suite.transactionID).Return(expectedErr).Once()
-	suite.bs.On("ChangeAmount",
-		ctx, suite.idFrom, amount).Return(expectedErr).Once()
-	suite.ts.On("CompletedByID",
-		ctx, suite.transactionID).Return(expectedErr).Once()
-	err := suite.useCase.ChangeAmount(ctx, &suite.idFrom, amount)
-	suite.Equal(expectedErr, err)
+func (suite *BalanceUseCaseTestSuite) TestChangeAmount_Success() {
+	testCases := []struct {
+		ctx             context.Context
+		idFrom          *string
+		idTo            *string
+		amount          float32
+		transactionID   string
+		transactionType entity.TransactionType
+		expectedErr     error
+	}{
+		{
+			ctx:             context.Background(),
+			idFrom:          &suite.idTo,
+			amount:          -1.3,
+			transactionID:   suite.transactionID,
+			transactionType: entity.TypeOuterDecreasing,
+			expectedErr:     nil,
+		},
+		{
+			ctx:             context.Background(),
+			idTo:            &suite.idTo,
+			amount:          2.3,
+			transactionID:   suite.transactionID,
+			transactionType: entity.TypeOuterIncreasing,
+			expectedErr:     nil,
+		},
+	}
+	for _, testCase := range testCases {
+		bs := &mock.BalanceService{}
+		ts := &mock.TransactionService{}
+		useCase := &BalanceUseCase{bs: bs, ts: ts}
+
+		bsChangeID := testCase.idFrom
+		if bsChangeID == nil {
+			bsChangeID = testCase.idTo
+		}
+
+		tsAmount := testCase.amount
+		if tsAmount < 0 {
+			tsAmount *= -1
+		}
+
+		ts.On("CreateDefaultTransaction", testCase.ctx, testCase.idFrom,
+			testCase.idTo, tsAmount, testCase.transactionType).
+			Return(testCase.transactionID, testCase.expectedErr).Once()
+		ts.On("ProcessingByID",
+			testCase.ctx, testCase.transactionID).Return(testCase.expectedErr).Once()
+		bs.On("ChangeAmount",
+			testCase.ctx, *bsChangeID, testCase.amount).Return(testCase.expectedErr).Once()
+		ts.On("CompletedByID",
+			testCase.ctx, testCase.transactionID).Return(testCase.expectedErr).Once()
+		err := useCase.ChangeAmount(testCase.ctx, bsChangeID, testCase.amount)
+		suite.Equal(testCase.expectedErr, err)
+	}
 }
 
 func (suite *BalanceUseCaseTestSuite) TestTransfer_TransferNoError() {

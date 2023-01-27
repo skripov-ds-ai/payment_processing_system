@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"errors"
-	"github.com/tkuchiki/faketime"
 	"payment_processing_system/internal/domain"
 	"payment_processing_system/internal/domain/entity"
 	"payment_processing_system/internal/domain/service/mock"
@@ -11,6 +10,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
+	"github.com/tkuchiki/faketime"
 )
 
 type TransactionServiceTestSuite struct {
