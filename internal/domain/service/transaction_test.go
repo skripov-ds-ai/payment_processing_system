@@ -17,11 +17,61 @@ type TransactionServiceTestSuite struct {
 	suite.Suite
 	testService *TransactionService
 	testStorage *mock.TransactionStorage
+	ctx         context.Context
+	id          string
 }
 
 func (suite *TransactionServiceTestSuite) SetupTest() {
 	suite.testStorage = &mock.TransactionStorage{}
 	suite.testService = NewTransactionService(suite.testStorage)
+
+	suite.ctx = context.Background()
+	suite.id = "example"
+}
+
+func (suite *TransactionServiceTestSuite) TestCancelByID() {
+	status := entity.StatusCancelled
+	var expectedErr error
+	suite.testStorage.On("UpdateStatusByID", suite.ctx, suite.id, status).
+		Return(expectedErr).Once()
+	err := suite.testService.CancelByID(suite.ctx, suite.id)
+	suite.Equal(expectedErr, err)
+}
+
+func (suite *TransactionServiceTestSuite) TestProcessingByID() {
+	status := entity.StatusProcessing
+	var expectedErr error
+	suite.testStorage.On("UpdateStatusByID", suite.ctx, suite.id, status).
+		Return(expectedErr).Once()
+	err := suite.testService.ProcessingByID(suite.ctx, suite.id)
+	suite.Equal(expectedErr, err)
+}
+
+func (suite *TransactionServiceTestSuite) TestCompletedByID() {
+	status := entity.StatusCompleted
+	var expectedErr error
+	suite.testStorage.On("UpdateStatusByID", suite.ctx, suite.id, status).
+		Return(expectedErr).Once()
+	err := suite.testService.CompletedByID(suite.ctx, suite.id)
+	suite.Equal(expectedErr, err)
+}
+
+func (suite *TransactionServiceTestSuite) TestShouldRetryByID() {
+	status := entity.StatusShouldRetry
+	var expectedErr error
+	suite.testStorage.On("UpdateStatusByID", suite.ctx, suite.id, status).
+		Return(expectedErr).Once()
+	err := suite.testService.ShouldRetryByID(suite.ctx, suite.id)
+	suite.Equal(expectedErr, err)
+}
+
+func (suite *TransactionServiceTestSuite) TestCannotApplyByID() {
+	status := entity.StatusCannotApply
+	var expectedErr error
+	suite.testStorage.On("UpdateStatusByID", suite.ctx, suite.id, status).
+		Return(expectedErr).Once()
+	err := suite.testService.CannotApplyByID(suite.ctx, suite.id)
+	suite.Equal(expectedErr, err)
 }
 
 func (suite *TransactionServiceTestSuite) TestCreateDefaultTransaction() {
