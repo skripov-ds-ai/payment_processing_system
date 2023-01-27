@@ -58,11 +58,9 @@ func (buc *BalanceUseCase) Transfer(ctx context.Context, idFrom, idTo *string, a
 	}
 	var transactionID *string
 	defer func() {
-		if err != nil {
-			// Cancel transaction on err
-			if transactionID != nil {
-				multierr.AppendInto(&err, buc.ts.CancelByID(ctx, *transactionID))
-			}
+		// Cancel transaction on err
+		if err != nil && transactionID != nil {
+			multierr.AppendInto(&err, buc.ts.CancelByID(ctx, *transactionID))
 		}
 	}()
 	// Create transaction
@@ -124,11 +122,9 @@ func (buc *BalanceUseCase) ChangeAmount(ctx context.Context, id *string, amount 
 	var transactionID *string
 	var err error
 	defer func() {
-		if err != nil {
-			// Cancel transaction on err
-			if transactionID != nil {
-				multierr.AppendInto(&err, buc.ts.CancelByID(ctx, *transactionID))
-			}
+		// Cancel transaction on err
+		if err != nil && transactionID != nil {
+			multierr.AppendInto(&err, buc.ts.CancelByID(ctx, *transactionID))
 		}
 	}()
 	// Create transaction
@@ -183,11 +179,9 @@ func (buc *BalanceUseCase) PayForService(ctx context.Context, id *string, amount
 	}
 	var transactionID *string
 	defer func() {
-		if err != nil {
-			// Cancel transaction on err
-			if transactionID != nil {
-				multierr.AppendInto(&err, buc.ts.CancelByID(ctx, *transactionID))
-			}
+		// Cancel transaction on err
+		if err != nil && transactionID != nil {
+			multierr.AppendInto(&err, buc.ts.CancelByID(ctx, *transactionID))
 		}
 	}()
 	// Create transaction
