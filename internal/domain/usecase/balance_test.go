@@ -2,12 +2,21 @@ package usecase
 
 import (
 	"context"
+	"errors"
+	"payment_processing_system/internal/domain"
 	"payment_processing_system/internal/domain/entity"
 	"payment_processing_system/internal/domain/usecase/mock"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
 )
+
+type mockChainInfo struct {
+	mockService string
+	methodName  string
+	args        []interface{}
+	returnArgs  []interface{}
+}
 
 type BalanceUseCaseTestSuite struct {
 	suite.Suite
@@ -26,6 +35,110 @@ func (suite *BalanceUseCaseTestSuite) SetupTest() {
 	suite.idFrom = "example-1"
 	suite.idTo = "example-2"
 	suite.transactionID = "transaction-1"
+}
+
+func (suite *BalanceUseCaseTestSuite) TestChangeAmount_Error() {
+	var idNil *string
+	exampleError := errors.New("example error")
+	cancelError := errors.New("cancel error")
+	testCases := []struct {
+		ctx            context.Context
+		id             *string
+		amount         float32
+		expectedErrors []error
+		mockChain      []mockChainInfo
+	}{
+		{
+			ctx:            context.Background(),
+			id:             nil,
+			amount:         1,
+			expectedErrors: []error{domain.TransactionNilSourceOrDestinationErr},
+		},
+		{
+			ctx:            context.Background(),
+			id:             &suite.idFrom,
+			amount:         0,
+			expectedErrors: []error{domain.ChangeBalanceByZeroAmountErr},
+		},
+		{
+			ctx:            context.Background(),
+			id:             &suite.idTo,
+			amount:         1,
+			expectedErrors: []error{},
+			mockChain: []mockChainInfo{
+				{
+					mockService: "ts",
+					methodName:  "CreateDefaultTransaction",
+					args: []interface{}{
+						context.Background(),
+						idNil,
+						&suite.idTo,
+						float32(1),
+						entity.TypeOuterIncreasing,
+					},
+					returnArgs: []interface{}{
+						"",
+						exampleError,
+					},
+				},
+			},
+		},
+		{
+			ctx:            context.Background(),
+			id:             &suite.idTo,
+			amount:         1,
+			expectedErrors: []error{},
+			mockChain: []mockChainInfo{
+				{
+					mockService: "ts",
+					methodName:  "CreateDefaultTransaction",
+					args: []interface{}{
+						context.Background(),
+						idNil,
+						&suite.idTo,
+						float32(1),
+						entity.TypeOuterIncreasing,
+					},
+					returnArgs: []interface{}{
+						suite.transactionID,
+						exampleError,
+					},
+				},
+				{
+					mockService: "ts",
+					methodName:  "CancelByID",
+					args: []interface{}{
+						context.Background(),
+						suite.transactionID,
+					},
+					returnArgs: []interface{}{
+						cancelError,
+					},
+				},
+			},
+		},
+	}
+	for _, testCase := range testCases {
+		bs := &mock.BalanceService{}
+		ts := &mock.TransactionService{}
+		useCase := &BalanceUseCase{bs: bs, ts: ts}
+		for _, mockAction := range testCase.mockChain {
+			if mockAction.mockService == "ts" {
+				ts.On(mockAction.methodName, mockAction.args...).Return(mockAction.returnArgs...).Once()
+				continue
+			}
+			if mockAction.mockService == "bs" {
+				bs.On(mockAction.methodName, mockAction.args...).Return(mockAction.returnArgs...).Once()
+				continue
+			}
+			suite.Fail("mockAction in mockChain is not necessary", mockAction.mockService, mockAction)
+		}
+
+		err := useCase.ChangeAmount(testCase.ctx, testCase.id, testCase.amount)
+		for _, expectedErr := range testCase.expectedErrors {
+			suite.ErrorIs(err, expectedErr)
+		}
+	}
 }
 
 func (suite *BalanceUseCaseTestSuite) TestChangeAmount_Success() {

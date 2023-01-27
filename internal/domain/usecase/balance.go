@@ -61,7 +61,9 @@ func (buc *BalanceUseCase) Transfer(ctx context.Context, idFrom, idTo *string, a
 	transactionID, err = buc.ts.CreateDefaultTransaction(ctx, idFrom, idTo, amount, entity.TypeTransfer)
 	// Cancel transaction on err
 	if err != nil {
-		multierr.AppendInto(&err, buc.ts.CancelByID(ctx, transactionID))
+		if transactionID != "" {
+			multierr.AppendInto(&err, buc.ts.CancelByID(ctx, transactionID))
+		}
 		return err
 	}
 	// Change transaction status to "processing"
@@ -131,7 +133,9 @@ func (buc *BalanceUseCase) ChangeAmount(ctx context.Context, id *string, amount 
 	}
 	// Cancel transaction on err
 	if err != nil {
-		multierr.AppendInto(&err, buc.ts.CancelByID(ctx, transactionID))
+		if transactionID != "" {
+			multierr.AppendInto(&err, buc.ts.CancelByID(ctx, transactionID))
+		}
 		return err
 	}
 	// Change transaction status to "processing"
@@ -184,7 +188,9 @@ func (buc *BalanceUseCase) PayForService(ctx context.Context, id *string, amount
 	transactionID, err = buc.ts.CreateDefaultTransaction(ctx, id, nil, -amount, entity.TypePayment)
 	// Cancel transaction on err
 	if err != nil {
-		multierr.AppendInto(&err, buc.ts.CancelByID(ctx, transactionID))
+		if transactionID != "" {
+			multierr.AppendInto(&err, buc.ts.CancelByID(ctx, transactionID))
+		}
 		return err
 	}
 	// Change transaction status to "processing"
