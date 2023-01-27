@@ -1,11 +1,12 @@
 package logger
 
 import (
+	"testing"
+
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest"
-	"testing"
 )
 
 func TestInfof(t *testing.T) {
