@@ -7,9 +7,8 @@ import (
 	"payment_processing_system/internal/domain/entity"
 	"payment_processing_system/pkg/logger"
 
-	"go.uber.org/zap"
-
 	"github.com/labstack/echo/v4"
+	"go.uber.org/zap"
 )
 
 // Converter of currency
