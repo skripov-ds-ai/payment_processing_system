@@ -63,6 +63,8 @@
 - Метод начисления средств на баланс. Принимает id пользователя и сколько 
 средств зачислить. (POST `/balances/{id}`)
 
+=> Transaction(id, source, destination, type, amount, status, datetime_created, datetime_updated)
+
 - Метод резервирования средств с основного баланса на отдельном счете. 
 Принимает id пользователя, ИД услуги, ИД заказа, стоимость. (POST `/reservation/balances/{id}`)
 
