@@ -35,6 +35,10 @@ func NewBalanceUseCase(bs BalanceService, ts TransactionService) *BalanceUseCase
 	return &BalanceUseCase{bs: bs, ts: ts}
 }
 
+func (buc *BalanceUseCase) GetByID(ctx context.Context, id string) (*entity.Balance, error) {
+	return buc.bs.GetByID(ctx, id)
+}
+
 func (buc *BalanceUseCase) Transfer(ctx context.Context, idFrom, idTo *string, amount float32) error {
 	if idFrom == nil {
 		return domain.TransactionNilSourceErr
