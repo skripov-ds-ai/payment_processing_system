@@ -47,7 +47,6 @@ func (b *balanceHandler) GetBalanceByID(ctx echo.Context, id string, params GetB
 		// TODO: think about zap.Field vs interface
 		b.logger.Error("error during getting balance", zap.String("id", id), zap.Error(err))
 		e := Error{
-			Code:    http.StatusBadRequest,
 			Message: fmt.Sprintf("something went wrong during getting balance by id = %s", id),
 		}
 		// TODO: wrap an error
@@ -58,7 +57,7 @@ func (b *balanceHandler) GetBalanceByID(ctx echo.Context, id string, params GetB
 		return err
 	}
 	if balance == nil {
-		e := Error{Code: http.StatusNotFound, Message: "balance not found"}
+		e := Error{Message: "balance not found"}
 		// TODO: wrap an error
 		err1 := ctx.JSON(http.StatusNotFound, e)
 		if err != nil {
@@ -75,7 +74,6 @@ func (b *balanceHandler) GetBalanceByID(ctx echo.Context, id string, params GetB
 				zap.String("currency", *params.Currency),
 				zap.Error(err1))
 			e := Error{
-				Code:    http.StatusBadRequest,
 				Message: fmt.Sprintf("something went wrong during convertation to %s", *params.Currency),
 			}
 			// TODO: wrap an error
