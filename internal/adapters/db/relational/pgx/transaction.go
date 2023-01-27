@@ -51,7 +51,7 @@ func (ts *transactionStorage) UpdateStatusByID(ctx context.Context, id, status s
 	return nil
 }
 
-func (ts *transactionStorage) Create(ctx context.Context, transaction entity.Transaction) (string, error) {
+func (ts *transactionStorage) Create(ctx context.Context, transaction entity.Transaction) (*string, error) {
 	sql, args, buildErr := ts.queryBuilder.
 		Insert(ts.tableScheme).Columns(
 		"amount", "source_id", "destination_id",
@@ -68,13 +68,13 @@ func (ts *transactionStorage) Create(ctx context.Context, transaction entity.Tra
 	if buildErr != nil {
 		// TODO: add wrapping
 		// buildErr
-		return "", buildErr
+		return nil, buildErr
 	}
 	err := ts.pool.QueryRow(ctx, sql, args...).Scan(&transaction.ID)
 	if err != nil {
-		return transaction.ID, err
+		return &transaction.ID, err
 	}
-	return transaction.ID, nil
+	return &transaction.ID, nil
 }
 
 func (ts *transactionStorage) GetByID(ctx context.Context, id string) (*entity.Transaction, error) {
