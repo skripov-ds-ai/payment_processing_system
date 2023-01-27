@@ -77,7 +77,7 @@ func (suite *BalanceUseCaseTestSuite) TestChangeAmount_Error() {
 						entity.TypeOuterIncreasing,
 					},
 					returnArgs: []interface{}{
-						"",
+						idNil,
 						exampleError,
 					},
 				},
@@ -100,7 +100,7 @@ func (suite *BalanceUseCaseTestSuite) TestChangeAmount_Error() {
 						entity.TypeOuterIncreasing,
 					},
 					returnArgs: []interface{}{
-						suite.transactionID,
+						&suite.transactionID,
 						exampleError,
 					},
 				},
@@ -185,7 +185,7 @@ func (suite *BalanceUseCaseTestSuite) TestChangeAmount_Success() {
 
 		ts.On("CreateDefaultTransaction", testCase.ctx, testCase.idFrom,
 			testCase.idTo, tsAmount, testCase.transactionType).
-			Return(testCase.transactionID, testCase.expectedErr).Once()
+			Return(&testCase.transactionID, testCase.expectedErr).Once()
 		ts.On("ProcessingByID",
 			testCase.ctx, testCase.transactionID).Return(testCase.expectedErr).Once()
 		bs.On("ChangeAmount",
@@ -206,7 +206,7 @@ func (suite *BalanceUseCaseTestSuite) TestTransfer_TransferNoError() {
 		Return(entityBalancePtr, expectedErr).Once()
 	suite.ts.On("CreateDefaultTransaction", ctx, &suite.idFrom,
 		&suite.idTo, amount, entity.TypeTransfer).
-		Return(suite.transactionID, expectedErr).Once()
+		Return(&suite.transactionID, expectedErr).Once()
 	suite.ts.On("ProcessingByID",
 		ctx, suite.transactionID).Return(expectedErr).Once()
 	suite.bs.On("ChangeAmount",

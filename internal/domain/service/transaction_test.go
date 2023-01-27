@@ -15,10 +15,11 @@ import (
 
 type TransactionServiceTestSuite struct {
 	suite.Suite
-	testService *TransactionService
-	testStorage *mock.TransactionStorage
-	ctx         context.Context
-	id          string
+	testService   *TransactionService
+	testStorage   *mock.TransactionStorage
+	ctx           context.Context
+	id            string
+	transactionID string
 }
 
 func (suite *TransactionServiceTestSuite) SetupTest() {
@@ -27,6 +28,7 @@ func (suite *TransactionServiceTestSuite) SetupTest() {
 
 	suite.ctx = context.Background()
 	suite.id = "example"
+	suite.transactionID = "example-transaction"
 }
 
 func (suite *TransactionServiceTestSuite) TestCancelByID() {
@@ -87,26 +89,26 @@ func (suite *TransactionServiceTestSuite) TestCreateDefaultTransaction() {
 		destinationID         *string
 		amount                float32
 		ttype                 entity.TransactionType
-		expectedID            string
+		expectedID            *string
 		expectedErr           error
 		expectMockStorageCall bool
 	}{
 		{
 			ctx:         context.Background(),
 			amount:      0,
-			expectedID:  "",
+			expectedID:  nil,
 			expectedErr: domain.ZeroAmountTransactionErr,
 		},
 		{
 			ctx:         context.Background(),
 			amount:      -1,
-			expectedID:  "",
+			expectedID:  nil,
 			expectedErr: domain.NegativeAmountTransactionErr,
 		},
 		{
 			ctx:         context.Background(),
 			amount:      1,
-			expectedID:  "",
+			expectedID:  nil,
 			expectedErr: domain.TransactionNilSourceAndDestinationErr,
 		},
 		{
@@ -114,7 +116,7 @@ func (suite *TransactionServiceTestSuite) TestCreateDefaultTransaction() {
 			amount:        1,
 			sourceID:      &sourceID,
 			destinationID: &sourceID,
-			expectedID:    "",
+			expectedID:    nil,
 			expectedErr:   domain.TransactionSourceDestinationAreEqualErr,
 		},
 		{
@@ -123,7 +125,7 @@ func (suite *TransactionServiceTestSuite) TestCreateDefaultTransaction() {
 			sourceID:              &sourceID,
 			destinationID:         &destinationID,
 			ttype:                 entity.TypeTransfer,
-			expectedID:            "42",
+			expectedID:            &suite.transactionID,
 			expectedErr:           nil,
 			expectMockStorageCall: true,
 		},
@@ -133,7 +135,7 @@ func (suite *TransactionServiceTestSuite) TestCreateDefaultTransaction() {
 			sourceID:              &sourceID,
 			destinationID:         &destinationID,
 			ttype:                 entity.TypeTransfer,
-			expectedID:            "",
+			expectedID:            nil,
 			expectedErr:           errors.New("database error"),
 			expectMockStorageCall: true,
 		},
