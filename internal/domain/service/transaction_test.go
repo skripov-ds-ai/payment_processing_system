@@ -146,12 +146,13 @@ func (suite *TransactionServiceTestSuite) TestCreateDefaultTransaction() {
 
 		if testCase.expectMockStorageCall {
 			transaction := entity.Transaction{
-				SourceID:      testCase.sourceID,
-				DestinationID: testCase.destinationID,
-				Amount:        testCase.amount,
-				Type:          testCase.ttype,
-				DateTime:      time.Now(),
-				Status:        entity.StatusCreated,
+				SourceID:        testCase.sourceID,
+				DestinationID:   testCase.destinationID,
+				Amount:          testCase.amount,
+				Type:            testCase.ttype,
+				DateTimeCreated: time.Now(),
+				DateTimeUpdated: time.Now(),
+				Status:          entity.StatusCreated,
 			}
 			storage.On("Create", testCase.ctx, transaction).
 				Return(testCase.expectedID, testCase.expectedErr).

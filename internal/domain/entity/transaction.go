@@ -29,7 +29,8 @@ type Transaction struct {
 	SourceID      *string           `json:"source_id"`
 	DestinationID *string           `json:"destination_id"`
 	Amount        float32           `json:"amount"`
-	Type          TransactionType   `json:"type"`
-	DateTime      time.Time         `json:"date_time"`
-	Status        TransactionStatus `json:"status"`
+	Type            TransactionType   `json:"type"`
+	DateTimeCreated time.Time         `json:"date_time_created"`
+	DateTimeUpdated time.Time         `json:"date_time_updated"`
+	Status          TransactionStatus `json:"status"`
 }
