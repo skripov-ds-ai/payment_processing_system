@@ -56,7 +56,7 @@ func (b *balanceHandler) GetBalanceByID(ctx echo.Context, id string, params GetB
 	if balance == nil {
 		e := Error{Message: "balance not found"}
 		err1 := ctx.JSON(http.StatusNotFound, e)
-		if err != nil {
+		if err1 != nil {
 			b.logger.Error("error during sending error json", zap.Error(err1))
 		}
 		return nil
