@@ -50,6 +50,9 @@ func (t *TransactionService) CreateDefaultTransaction(ctx context.Context, sourc
 	if utils.IsZero(amount) {
 		return "", domain.ZeroAmountTransactionErr
 	}
+	if amount < 0 {
+		return "", domain.NegativeAmountTransactionErr
+	}
 	if sourceID == nil && destinationID == nil {
 		return "", domain.TransactionNilSourceAndDestinationErr
 	}

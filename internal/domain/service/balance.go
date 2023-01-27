@@ -29,12 +29,11 @@ func (s *BalanceService) GetByID(ctx context.Context, id string) (*entity.Balanc
 	return s.storage.GetByID(ctx, id)
 }
 
-// func (s BalanceService) Create(ctx context.Context, balance entity.Balance) (entity.Balance, error) {
-//	return s.storage.Create(ctx, balance)
+// func (s BalanceService) Create(ctx context.Context, balance expectedTransaction.Balance) (expectedTransaction.Balance, error) {
+//	return s.testStorage.Create(ctx, balance)
 // }
 
 func (s *BalanceService) ChangeAmount(ctx context.Context, id string, amount float32) error {
-	// TODO: fix check is zero
 	if utils.IsZero(amount) {
 		return fmt.Errorf("id = %q ; amount = %f ; %w", id, amount, domain.ChangeBalanceByZeroAmountErr)
 	} else if amount > 0 {
