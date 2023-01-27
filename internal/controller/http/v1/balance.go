@@ -40,16 +40,12 @@ func NewBalanceHandler(service BalanceService, converter Converter, logger *logg
 // GetBalanceByID returns json of balance object or error
 // (GET /balances/{id})
 func (b *balanceHandler) GetBalanceByID(ctx echo.Context, id string, params GetBalanceByIdParams) error {
-	// TODO: add currency processing
 	balance, err := b.service.GetByID(ctx.Request().Context(), id)
 	if err != nil {
-		// TODO: add logging
-		// TODO: think about zap.Field vs interface
 		b.logger.Error("error during getting balance", zap.String("id", id), zap.Error(err))
 		e := Error{
 			Message: fmt.Sprintf("something went wrong during getting balance by id = %s", id),
 		}
-		// TODO: wrap an error
 		err1 := ctx.JSON(http.StatusBadRequest, e)
 		if err1 != nil {
 			b.logger.Error("error during sending error json", zap.Error(err1))
@@ -58,7 +54,6 @@ func (b *balanceHandler) GetBalanceByID(ctx echo.Context, id string, params GetB
 	}
 	if balance == nil {
 		e := Error{Message: "balance not found"}
-		// TODO: wrap an error
 		err1 := ctx.JSON(http.StatusNotFound, e)
 		if err != nil {
 			b.logger.Error("error during sending error json", zap.Error(err1))
@@ -76,7 +71,6 @@ func (b *balanceHandler) GetBalanceByID(ctx echo.Context, id string, params GetB
 			e := Error{
 				Message: fmt.Sprintf("something went wrong during convertation to %s", *params.Currency),
 			}
-			// TODO: wrap an error
 			err2 := ctx.JSON(http.StatusNotFound, e)
 			if err2 != nil {
 				b.logger.Error("error during sending error json", zap.Error(err2))
