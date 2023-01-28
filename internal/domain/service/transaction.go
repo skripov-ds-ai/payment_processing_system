@@ -10,7 +10,7 @@ import (
 
 type TransactionStorage interface {
 	GetByID(ctx context.Context, id string) (*entity.Transaction, error)
-	Create(ctx context.Context, transaction entity.Transaction) (*string, error)
+	Create(ctx context.Context, transaction entity.Transaction) (*entity.Transaction, error)
 	UpdateStatusByID(ctx context.Context, id string, status entity.TransactionStatus) error
 }
 
@@ -46,7 +46,7 @@ func (t *TransactionService) CannotApplyByID(ctx context.Context, id string) err
 	return t.storage.UpdateStatusByID(ctx, id, entity.StatusCannotApply)
 }
 
-func (t *TransactionService) CreateDefaultTransaction(ctx context.Context, sourceID, destinationID *string, amount float32, ttype entity.TransactionType) (*string, error) {
+func (t *TransactionService) CreateDefaultTransaction(ctx context.Context, sourceID, destinationID *string, amount float32, ttype entity.TransactionType) (*entity.Transaction, error) {
 	if utils.IsZero(amount) {
 		return nil, domain.ZeroAmountTransactionErr
 	}

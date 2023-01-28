@@ -15,15 +15,15 @@ type TransactionStorage struct {
 }
 
 // Create provides a mock function with given fields: ctx, transaction
-func (_m *TransactionStorage) Create(ctx context.Context, transaction entity.Transaction) (*string, error) {
+func (_m *TransactionStorage) Create(ctx context.Context, transaction entity.Transaction) (*entity.Transaction, error) {
 	ret := _m.Called(ctx, transaction)
 
-	var r0 *string
-	if rf, ok := ret.Get(0).(func(context.Context, entity.Transaction) *string); ok {
+	var r0 *entity.Transaction
+	if rf, ok := ret.Get(0).(func(context.Context, entity.Transaction) *entity.Transaction); ok {
 		r0 = rf(ctx, transaction)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*string)
+			r0 = ret.Get(0).(*entity.Transaction)
 		}
 	}
 

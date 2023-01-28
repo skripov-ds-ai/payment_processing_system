@@ -57,15 +57,15 @@ func (_m *TransactionService) CompletedByID(ctx context.Context, id string) erro
 }
 
 // CreateDefaultTransaction provides a mock function with given fields: ctx, sourceID, destinationID, amount, ttype
-func (_m *TransactionService) CreateDefaultTransaction(ctx context.Context, sourceID *string, destinationID *string, amount float32, ttype entity.TransactionType) (*string, error) {
+func (_m *TransactionService) CreateDefaultTransaction(ctx context.Context, sourceID *string, destinationID *string, amount float32, ttype entity.TransactionType) (*entity.Transaction, error) {
 	ret := _m.Called(ctx, sourceID, destinationID, amount, ttype)
 
-	var r0 *string
-	if rf, ok := ret.Get(0).(func(context.Context, *string, *string, float32, entity.TransactionType) *string); ok {
+	var r0 *entity.Transaction
+	if rf, ok := ret.Get(0).(func(context.Context, *string, *string, float32, entity.TransactionType) *entity.Transaction); ok {
 		r0 = rf(ctx, sourceID, destinationID, amount, ttype)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*string)
+			r0 = ret.Get(0).(*entity.Transaction)
 		}
 	}
 
