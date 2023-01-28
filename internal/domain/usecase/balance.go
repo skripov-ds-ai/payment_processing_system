@@ -39,7 +39,7 @@ func (buc *BalanceUseCase) GetByID(ctx context.Context, id string) (*entity.Bala
 	return buc.bs.GetByID(ctx, id)
 }
 
-func (buc *BalanceUseCase) Transfer(ctx context.Context, idFrom, idTo *string, amount float32) error {
+func (buc *BalanceUseCase) Transfer(ctx context.Context, idFrom, idTo *string, amount float32) (err error) {
 	if idFrom == nil {
 		return domain.TransactionNilSourceErr
 	}
@@ -47,16 +47,16 @@ func (buc *BalanceUseCase) Transfer(ctx context.Context, idFrom, idTo *string, a
 		return domain.TransactionNilDestinationErr
 	}
 	if utils.IsZero(amount) {
-		return fmt.Errorf("idFrom = %q ; id = %q ; amount = %f ; %w", *idFrom, *idTo, amount, domain.ChangeBalanceByZeroAmountErr)
+		return fmt.Errorf("idFrom = %q ; idFrom = %q ; amount = %f ; %w", *idFrom, *idTo, amount, domain.ChangeBalanceByZeroAmountErr)
 	}
 	if amount < 0 {
-		return fmt.Errorf("idFrom = %q ; id = %q ; amount = %f ; %w", *idFrom, *idTo, amount, domain.NegativeAmountTransactionErr)
+		return fmt.Errorf("idFrom = %q ; idFrom = %q ; amount = %f ; %w", *idFrom, *idTo, amount, domain.NegativeAmountTransactionErr)
 	}
 	if *idFrom == *idTo {
-		return fmt.Errorf("idFrom = %q ; id = %q ; %w", *idFrom, *idTo, domain.TransactionSourceDestinationAreEqualErr)
+		return fmt.Errorf("idFrom = %q ; idFrom = %q ; %w", *idFrom, *idTo, domain.TransactionSourceDestinationAreEqualErr)
 	}
 	// Check existence of idFrom balance
-	_, err := buc.bs.GetByID(ctx, *idFrom)
+	_, err = buc.bs.GetByID(ctx, *idFrom)
 	if err != nil {
 		return err
 	}
@@ -116,15 +116,14 @@ func (buc *BalanceUseCase) Transfer(ctx context.Context, idFrom, idTo *string, a
 	return nil
 }
 
-func (buc *BalanceUseCase) ChangeAmount(ctx context.Context, id *string, amount float32) error {
+func (buc *BalanceUseCase) ChangeAmount(ctx context.Context, id *string, amount float32) (err error) {
 	if id == nil {
 		return domain.TransactionNilSourceOrDestinationErr
 	}
 	if utils.IsZero(amount) {
-		return fmt.Errorf("id = %q ; amount = %f ; %w", *id, amount, domain.ChangeBalanceByZeroAmountErr)
+		return fmt.Errorf("idFrom = %q ; amount = %f ; %w", *id, amount, domain.ChangeBalanceByZeroAmountErr)
 	}
 	var transaction *entity.Transaction
-	var err error
 	defer func() {
 		// Cancel transaction on err
 		if err != nil && transaction != nil {
@@ -166,18 +165,18 @@ func (buc *BalanceUseCase) ChangeAmount(ctx context.Context, id *string, amount 
 	return nil
 }
 
-func (buc *BalanceUseCase) PayForService(ctx context.Context, id *string, amount float32) error {
+func (buc *BalanceUseCase) PayForService(ctx context.Context, id *string, amount float32) (err error) {
 	if id == nil {
 		return domain.TransactionNilSourceErr
 	}
 	if utils.IsZero(amount) {
-		return fmt.Errorf("id = %q ; amount = %f ; %w", *id, amount, domain.ChangeBalanceByZeroAmountErr)
+		return fmt.Errorf("idFrom = %q ; amount = %f ; %w", *id, amount, domain.ChangeBalanceByZeroAmountErr)
 	}
 	if amount < 0 {
-		return fmt.Errorf("id = %q ; amount = %f ; %w", *id, amount, domain.NegativeAmountTransactionErr)
+		return fmt.Errorf("idFrom = %q ; amount = %f ; %w", *id, amount, domain.NegativeAmountTransactionErr)
 	}
-	// Check existence of id balance
-	_, err := buc.bs.GetByID(ctx, *id)
+	// Check existence of idFrom balance
+	_, err = buc.bs.GetByID(ctx, *id)
 	if err != nil {
 		return err
 	}

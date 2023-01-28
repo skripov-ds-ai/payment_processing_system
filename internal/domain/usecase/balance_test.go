@@ -31,10 +31,44 @@ type BalanceUseCaseTestSuite struct {
 func (suite *BalanceUseCaseTestSuite) SetupTest() {
 	suite.bs = &mock.BalanceService{}
 	suite.ts = &mock.TransactionService{}
-	suite.useCase = &BalanceUseCase{bs: suite.bs, ts: suite.ts}
+	suite.useCase = NewBalanceUseCase(suite.bs, suite.ts)
 	suite.idFrom = "example-1"
 	suite.idTo = "example-2"
 	suite.transactionID = "transaction-1"
+}
+
+func (suite *BalanceUseCaseTestSuite) TestGetByID() {
+	testCases := []struct {
+		ctx             context.Context
+		id              string
+		expectedBalance *entity.Balance
+		expectedErr     error
+	}{
+		{
+			ctx:             context.Background(),
+			id:              suite.idTo,
+			expectedBalance: &entity.Balance{ID: suite.idTo},
+			expectedErr:     nil,
+		},
+		{
+			ctx:             context.Background(),
+			id:              suite.idFrom,
+			expectedBalance: nil,
+			expectedErr:     errors.New("example get error"),
+		},
+	}
+	for _, testCase := range testCases {
+		bs := &mock.BalanceService{}
+		ts := &mock.TransactionService{}
+		useCase := &BalanceUseCase{bs: bs, ts: ts}
+		bs.On("GetByID", testCase.ctx, testCase.id).
+			Return(testCase.expectedBalance, testCase.expectedErr).Once()
+		balance, err := useCase.GetByID(testCase.ctx, testCase.id)
+		if err != nil {
+			suite.EqualError(err, testCase.expectedErr.Error())
+		}
+		suite.Equal(testCase.expectedBalance, balance)
+	}
 }
 
 func (suite *BalanceUseCaseTestSuite) TestChangeAmount_Error() {
@@ -68,7 +102,7 @@ func (suite *BalanceUseCaseTestSuite) TestChangeAmount_Error() {
 			ctx:            context.Background(),
 			id:             &suite.idTo,
 			amount:         1,
-			expectedErrors: []error{},
+			expectedErrors: []error{exampleError},
 			mockChain: []mockChainInfo{
 				{
 					mockService: "ts",
@@ -91,7 +125,7 @@ func (suite *BalanceUseCaseTestSuite) TestChangeAmount_Error() {
 			ctx:            context.Background(),
 			id:             &suite.idTo,
 			amount:         1,
-			expectedErrors: []error{},
+			expectedErrors: []error{cancelError, exampleError},
 			mockChain: []mockChainInfo{
 				{
 					mockService: "ts",
@@ -125,7 +159,7 @@ func (suite *BalanceUseCaseTestSuite) TestChangeAmount_Error() {
 	for _, testCase := range testCases {
 		bs := &mock.BalanceService{}
 		ts := &mock.TransactionService{}
-		useCase := &BalanceUseCase{bs: bs, ts: ts}
+		useCase := NewBalanceUseCase(bs, ts)
 		for _, mockAction := range testCase.mockChain {
 			if mockAction.mockService == "ts" {
 				ts.On(mockAction.methodName, mockAction.args...).Return(mockAction.returnArgs...).Once()
@@ -175,7 +209,7 @@ func (suite *BalanceUseCaseTestSuite) TestChangeAmount_Success() {
 	for _, testCase := range testCases {
 		bs := &mock.BalanceService{}
 		ts := &mock.TransactionService{}
-		useCase := &BalanceUseCase{bs: bs, ts: ts}
+		useCase := NewBalanceUseCase(bs, ts)
 
 		bsChangeID := testCase.idFrom
 		if bsChangeID == nil {
@@ -198,6 +232,101 @@ func (suite *BalanceUseCaseTestSuite) TestChangeAmount_Success() {
 			testCase.ctx, testCase.transaction.ID).Return(testCase.expectedErr).Once()
 		err := useCase.ChangeAmount(testCase.ctx, bsChangeID, testCase.amount)
 		suite.Equal(testCase.expectedErr, err)
+	}
+}
+
+func (suite *BalanceUseCaseTestSuite) TestTransfer_Error() {
+	//var idNil *string
+	//var nilTransaction *entity.Transaction
+	//var validTransaction = entity.Transaction{
+	//	ID: suite.transactionID,
+	//}
+	exampleError := errors.New("example error")
+	//cancelError := errors.New("cancel error")
+	testCases := []struct {
+		ctx            context.Context
+		idFrom         *string
+		idTo           *string
+		amount         float32
+		expectedErrors []error
+		mockChain      []mockChainInfo
+	}{
+		{
+			ctx:            context.Background(),
+			idFrom:         nil,
+			amount:         1,
+			expectedErrors: []error{domain.TransactionNilSourceErr},
+		},
+		{
+			ctx:            context.Background(),
+			idFrom:         &suite.idFrom,
+			idTo:           nil,
+			amount:         1,
+			expectedErrors: []error{domain.TransactionNilDestinationErr},
+		},
+		{
+			ctx:            context.Background(),
+			idFrom:         &suite.idFrom,
+			idTo:           &suite.idTo,
+			amount:         0,
+			expectedErrors: []error{domain.ChangeBalanceByZeroAmountErr},
+		},
+		{
+			ctx:            context.Background(),
+			idFrom:         &suite.idFrom,
+			idTo:           &suite.idTo,
+			amount:         -42,
+			expectedErrors: []error{domain.NegativeAmountTransactionErr},
+		},
+		{
+			ctx:            context.Background(),
+			idFrom:         &suite.idFrom,
+			idTo:           &suite.idFrom,
+			amount:         100,
+			expectedErrors: []error{domain.TransactionSourceDestinationAreEqualErr},
+		},
+		{
+			ctx:            context.Background(),
+			idFrom:         &suite.idFrom,
+			idTo:           &suite.idTo,
+			amount:         100,
+			expectedErrors: []error{exampleError},
+			mockChain: []mockChainInfo{
+				{
+					mockService: "bs",
+					methodName:  "GetByID",
+					args: []interface{}{
+						context.Background(),
+						suite.idFrom,
+					},
+					returnArgs: []interface{}{
+						&entity.Balance{},
+						exampleError,
+					},
+				},
+			},
+		},
+	}
+	for _, testCase := range testCases {
+		bs := &mock.BalanceService{}
+		ts := &mock.TransactionService{}
+		useCase := NewBalanceUseCase(bs, ts)
+		for _, mockAction := range testCase.mockChain {
+			if mockAction.mockService == "ts" {
+				ts.On(mockAction.methodName, mockAction.args...).Return(mockAction.returnArgs...).Once()
+				continue
+			}
+			if mockAction.mockService == "bs" {
+				bs.On(mockAction.methodName, mockAction.args...).Return(mockAction.returnArgs...).Once()
+				continue
+			}
+			suite.Fail("mockAction in mockChain is not necessary", mockAction.mockService, mockAction)
+		}
+
+		err := useCase.Transfer(testCase.ctx, testCase.idFrom, testCase.idTo, testCase.amount)
+		for _, expectedErr := range testCase.expectedErrors {
+			suite.ErrorIs(err, expectedErr)
+		}
 	}
 }
 
