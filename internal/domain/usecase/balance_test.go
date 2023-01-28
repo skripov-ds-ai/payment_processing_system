@@ -236,13 +236,13 @@ func (suite *BalanceUseCaseTestSuite) TestChangeAmount_Success() {
 }
 
 func (suite *BalanceUseCaseTestSuite) TestTransfer_Error() {
-	//var idNil *string
+	// var idNil *string
 	//var nilTransaction *entity.Transaction
 	//var validTransaction = entity.Transaction{
 	//	ID: suite.transactionID,
 	//}
 	exampleError := errors.New("example error")
-	//cancelError := errors.New("cancel error")
+	// cancelError := errors.New("cancel error")
 	testCases := []struct {
 		ctx            context.Context
 		idFrom         *string
