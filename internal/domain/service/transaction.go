@@ -63,5 +63,6 @@ func (t *TransactionService) CreateDefaultTransaction(ctx context.Context, sourc
 	transaction := entity.Transaction{
 		Amount: amount, SourceID: sourceID, DestinationID: destinationID,
 		Status: entity.StatusCreated, DateTimeCreated: now, DateTimeUpdated: now, Type: ttype}
-	return t.storage.Create(ctx, transaction)
+	createdTransaction, err := t.storage.Create(ctx, transaction)
+	return createdTransaction, err
 }

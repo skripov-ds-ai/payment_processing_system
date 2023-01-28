@@ -11,6 +11,8 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
+// TODO: rewrite
+
 type mockChainInfo struct {
 	mockService string
 	methodName  string
@@ -22,7 +24,7 @@ type BalanceUseCaseTestSuite struct {
 	suite.Suite
 	bs            *mock.BalanceService
 	ts            *mock.TransactionService
-	useCase       *BalanceUseCase
+	useCase       *ManagerUseCase
 	idFrom        string
 	idTo          string
 	transactionID string
@@ -60,7 +62,7 @@ func (suite *BalanceUseCaseTestSuite) TestGetByID() {
 	for _, testCase := range testCases {
 		bs := &mock.BalanceService{}
 		ts := &mock.TransactionService{}
-		useCase := &BalanceUseCase{bs: bs, ts: ts}
+		useCase := &ManagerUseCase{bs: bs, ts: ts}
 		bs.On("GetByID", testCase.ctx, testCase.id).
 			Return(testCase.expectedBalance, testCase.expectedErr).Once()
 		balance, err := useCase.GetByID(testCase.ctx, testCase.id)
