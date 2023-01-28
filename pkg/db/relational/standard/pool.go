@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"log"
-	retry "payment_processing_system/pkg/client"
-	"payment_processing_system/pkg/client/relational"
+	retry "payment_processing_system/pkg/db"
+	"payment_processing_system/pkg/db/relational"
 	"time"
 	// importing MySQL
 	// _ "github.com/go-sql-driver/mysql"

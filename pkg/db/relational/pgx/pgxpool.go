@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"log"
-	retry "payment_processing_system/pkg/client"
-	"payment_processing_system/pkg/client/relational"
+	retry "payment_processing_system/pkg/db"
+	"payment_processing_system/pkg/db/relational"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
