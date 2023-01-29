@@ -40,7 +40,7 @@ func NewBalanceUseCase(bs BalanceGetService, ts TransactionGetCreateService, pro
 }
 
 // TODO: add GetBalanceTransactions(ctx context.Context, id string) ([]entity.Transaction, error)
-func (buc *ManagerUseCase)GetBalanceTransactions(ctx context.Context, id string) ([]entity.Transaction, error) {
+func (buc *ManagerUseCase) GetBalanceTransactions(ctx context.Context, id string) ([]entity.Transaction, error) {
 	return []entity.Transaction{}, nil
 }
 
