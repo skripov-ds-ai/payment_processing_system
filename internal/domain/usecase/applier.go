@@ -74,6 +74,9 @@ func (a *ApplierUseCase) applyTransfer(ctx context.Context, transaction entity.T
 func (a *ApplierUseCase) applyIncrease(ctx context.Context, transaction entity.Transaction) error {
 	err := a.bs.ChangeAmount(ctx, *transaction.DestinationID, transaction.Amount)
 	if err != nil {
+		if !errors.Is(err, domain.BalanceWasNotIncreased) {
+			multierr.AppendInto(&err, a.bs.ChangeAmount(ctx, *transaction.DestinationID, -transaction.Amount))
+		}
 		multierr.AppendInto(&err, a.producer.CancelTransaction(transaction.ID))
 		return err
 	}
@@ -84,6 +87,9 @@ func (a *ApplierUseCase) applyIncrease(ctx context.Context, transaction entity.T
 func (a *ApplierUseCase) applyDecrease(ctx context.Context, transaction entity.Transaction) error {
 	err := a.bs.ChangeAmount(ctx, *transaction.SourceID, -transaction.Amount)
 	if err != nil {
+		if !errors.Is(err, domain.BalanceWasNotDecreased) {
+			multierr.AppendInto(&err, a.bs.ChangeAmount(ctx, *transaction.DestinationID, transaction.Amount))
+		}
 		multierr.AppendInto(&err, a.producer.CancelTransaction(transaction.ID))
 		return err
 	}
@@ -94,6 +100,9 @@ func (a *ApplierUseCase) applyDecrease(ctx context.Context, transaction entity.T
 func (a *ApplierUseCase) applyPayForService(ctx context.Context, transaction entity.Transaction) error {
 	err := a.bs.ChangeAmount(ctx, *transaction.SourceID, -transaction.Amount)
 	if err != nil {
+		if !errors.Is(err, domain.BalanceWasNotDecreased) {
+			multierr.AppendInto(&err, a.bs.ChangeAmount(ctx, *transaction.DestinationID, transaction.Amount))
+		}
 		multierr.AppendInto(&err, a.producer.CancelTransaction(transaction.ID))
 		return err
 	}
