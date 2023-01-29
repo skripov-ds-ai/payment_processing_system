@@ -35,7 +35,7 @@ type ManagerUseCase struct {
 	producer ApplyTransactionProducer
 }
 
-func NewBalanceUseCase(bs BalanceGetService, ts TransactionGetCreateService, producer ApplyTransactionProducer) *ManagerUseCase {
+func NewManagerUseCase(bs BalanceGetService, ts TransactionGetCreateService, producer ApplyTransactionProducer) *ManagerUseCase {
 	return &ManagerUseCase{bs: bs, ts: ts, producer: producer}
 }
 

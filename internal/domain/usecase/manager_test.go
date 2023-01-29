@@ -33,7 +33,7 @@ type BalanceUseCaseTestSuite struct {
 func (suite *BalanceUseCaseTestSuite) SetupTest() {
 	suite.bs = &mock.BalanceService{}
 	suite.ts = &mock.TransactionService{}
-	suite.useCase = NewBalanceUseCase(suite.bs, suite.ts)
+	suite.useCase = NewManagerUseCase(suite.bs, suite.ts)
 	suite.idFrom = "example-1"
 	suite.idTo = "example-2"
 	suite.transactionID = "transaction-1"
@@ -161,7 +161,7 @@ func (suite *BalanceUseCaseTestSuite) TestChangeAmount_Error() {
 	for _, testCase := range testCases {
 		bs := &mock.BalanceService{}
 		ts := &mock.TransactionService{}
-		useCase := NewBalanceUseCase(bs, ts)
+		useCase := NewManagerUseCase(bs, ts)
 		for _, mockAction := range testCase.mockChain {
 			if mockAction.mockService == "ts" {
 				ts.On(mockAction.methodName, mockAction.args...).Return(mockAction.returnArgs...).Once()
@@ -211,7 +211,7 @@ func (suite *BalanceUseCaseTestSuite) TestChangeAmount_Success() {
 	for _, testCase := range testCases {
 		bs := &mock.BalanceService{}
 		ts := &mock.TransactionService{}
-		useCase := NewBalanceUseCase(bs, ts)
+		useCase := NewManagerUseCase(bs, ts)
 
 		bsChangeID := testCase.idFrom
 		if bsChangeID == nil {
@@ -306,7 +306,7 @@ func (suite *BalanceUseCaseTestSuite) TestTransfer_Error() {
 	for _, testCase := range testCases {
 		bs := &mock.BalanceService{}
 		ts := &mock.TransactionService{}
-		useCase := NewBalanceUseCase(bs, ts)
+		useCase := NewManagerUseCase(bs, ts)
 		for _, mockAction := range testCase.mockChain {
 			if mockAction.mockService == "ts" {
 				ts.On(mockAction.methodName, mockAction.args...).Return(mockAction.returnArgs...).Once()
