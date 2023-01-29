@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"payment_processing_system/internal/domain"
 	"payment_processing_system/internal/domain/entity"
-	"payment_processing_system/internal/utils"
+	"payment_processing_system/internal/zerocheker"
 )
 
 type BalanceStorage interface {
@@ -34,7 +34,7 @@ func (s *BalanceService) GetByID(ctx context.Context, id string) (*entity.Balanc
 // }
 
 func (s *BalanceService) ChangeAmount(ctx context.Context, id string, amount float32) error {
-	if utils.IsZero(amount) {
+	if zerocheker.IsZero(amount) {
 		return fmt.Errorf("id = %q ; amount = %f ; %w", id, amount, domain.ChangeBalanceByZeroAmountErr)
 	} else if amount > 0 {
 		return s.storage.IncreaseAmount(ctx, id, amount)

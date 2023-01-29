@@ -4,7 +4,7 @@ import (
 	"context"
 	"payment_processing_system/internal/domain"
 	"payment_processing_system/internal/domain/entity"
-	"payment_processing_system/internal/utils"
+	"payment_processing_system/internal/zerocheker"
 	"time"
 )
 
@@ -47,7 +47,7 @@ func (t *TransactionService) CannotApplyByID(ctx context.Context, id string) err
 }
 
 func (t *TransactionService) CreateDefaultTransaction(ctx context.Context, sourceID, destinationID *string, amount float32, ttype entity.TransactionType) (*entity.Transaction, error) {
-	if utils.IsZero(amount) {
+	if zerocheker.IsZero(amount) {
 		return nil, domain.ZeroAmountTransactionErr
 	}
 	if amount < 0 {

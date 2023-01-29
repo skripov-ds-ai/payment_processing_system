@@ -15,4 +15,5 @@ var (
 	TransactionNilSourceOrDestinationErr    = errors.New("source or destination of transaction are nil")
 	ZeroAmountTransactionErr                = errors.New("transaction amount is zero")
 	NegativeAmountTransactionErr            = errors.New("transaction amount is negative")
+	UnknownTransactionTypeErr               = errors.New("unknown transaction type")
 )

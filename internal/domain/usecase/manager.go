@@ -6,7 +6,7 @@ import (
 	"go.uber.org/multierr"
 	"payment_processing_system/internal/domain"
 	"payment_processing_system/internal/domain/entity"
-	"payment_processing_system/internal/utils"
+	"payment_processing_system/internal/zerocheker"
 )
 
 // TODO: usecases будут 3 типов
@@ -61,7 +61,7 @@ func (buc *ManagerUseCase) Transfer(ctx context.Context, idFrom, idTo *string, a
 	if idTo == nil {
 		return nil, domain.TransactionNilDestinationErr
 	}
-	if utils.IsZero(amount) {
+	if zerocheker.IsZero(amount) {
 		return nil, fmt.Errorf("idFrom = %q ; idFrom = %q ; amount = %f ; %w", *idFrom, *idTo, amount, domain.ChangeBalanceByZeroAmountErr)
 	}
 	if amount < 0 {
@@ -95,7 +95,7 @@ func (buc *ManagerUseCase) ChangeAmount(ctx context.Context, id *string, amount 
 	if id == nil {
 		return nil, domain.TransactionNilSourceOrDestinationErr
 	}
-	if utils.IsZero(amount) {
+	if zerocheker.IsZero(amount) {
 		return nil, fmt.Errorf("idFrom = %q ; amount = %f ; %w", *id, amount, domain.ChangeBalanceByZeroAmountErr)
 	}
 	// Create transaction
@@ -121,7 +121,7 @@ func (buc *ManagerUseCase) PayForService(ctx context.Context, id *string, amount
 	if id == nil {
 		return nil, domain.TransactionNilSourceErr
 	}
-	if utils.IsZero(amount) {
+	if zerocheker.IsZero(amount) {
 		return nil, fmt.Errorf("idFrom = %q ; amount = %f ; %w", *id, amount, domain.ChangeBalanceByZeroAmountErr)
 	}
 	if amount < 0 {
