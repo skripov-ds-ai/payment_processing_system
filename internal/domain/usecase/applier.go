@@ -10,13 +10,13 @@ import (
 )
 
 type ConfirmTransactionProducer interface {
-	CancelTransaction(id string) error
-	CompleteTransaction(id string) error
+	CancelTransaction(id int64) error
+	CompleteTransaction(id int64) error
 }
 
 type BalanceService interface {
-	GetByID(ctx context.Context, id string) (*entity.Balance, error)
-	ChangeAmount(ctx context.Context, id string, amount float32) error
+	GetByID(ctx context.Context, id int64) (*entity.Balance, error)
+	ChangeAmount(ctx context.Context, id int64, amount int64) error
 }
 
 type ApplierUseCase struct {

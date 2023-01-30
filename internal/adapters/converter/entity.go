@@ -4,7 +4,7 @@ type apiResult struct {
 	Date       string `json:"date"`
 	Historical string `json:"historical"`
 	Info       struct {
-		Rate      float32 `json:"rate"`
+		Rate      float64 `json:"rate"`
 		Timestamp int     `json:"timestamp"`
 	} `json:"info"`
 	Query struct {
@@ -12,6 +12,6 @@ type apiResult struct {
 		From   string `json:"from"`
 		To     string `json:"to"`
 	} `json:"query"`
-	Result  float32 `json:"result"`
+	Result  float64 `json:"result"`
 	Success bool    `json:"success"`
 }

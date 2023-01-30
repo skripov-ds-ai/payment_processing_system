@@ -6,7 +6,6 @@ import (
 	"go.uber.org/multierr"
 	"payment_processing_system/internal/domain"
 	"payment_processing_system/internal/domain/entity"
-	"payment_processing_system/internal/zerocheker"
 )
 
 // TODO: usecases будут 3 типов
@@ -20,13 +19,13 @@ type ApplyTransactionProducer interface {
 }
 
 type BalanceGetService interface {
-	GetByID(ctx context.Context, id string) (*entity.Balance, error)
+	GetByID(ctx context.Context, id int64) (*entity.Balance, error)
 }
 
 type TransactionGetCreateService interface {
-	GetByID(ctx context.Context, id string) (*entity.Transaction, error)
-	CreateDefaultTransaction(ctx context.Context, sourceID, destinationID *string, amount float32, ttype entity.TransactionType) (*entity.Transaction, error)
-	CancelByID(ctx context.Context, id string) error
+	GetByID(ctx context.Context, id int64) (*entity.Transaction, error)
+	CreateDefaultTransaction(ctx context.Context, sourceID, destinationID *int64, amount int64, ttype entity.TransactionType) (*entity.Transaction, error)
+	CancelByID(ctx context.Context, id int64) error
 }
 
 type ManagerUseCase struct {
@@ -44,11 +43,11 @@ func (buc *ManagerUseCase) GetBalanceTransactions(ctx context.Context, id string
 	return []entity.Transaction{}, nil
 }
 
-func (buc *ManagerUseCase) GetBalanceByID(ctx context.Context, id string) (*entity.Balance, error) {
+func (buc *ManagerUseCase) GetBalanceByID(ctx context.Context, id int64) (*entity.Balance, error) {
 	return buc.bs.GetByID(ctx, id)
 }
 
-func (buc *ManagerUseCase) Transfer(ctx context.Context, idFrom, idTo *string, amount float32) (transaction *entity.Transaction, err error) {
+func (buc *ManagerUseCase) Transfer(ctx context.Context, idFrom, idTo *int64, amount int64) (transaction *entity.Transaction, err error) {
 	defer func() {
 		// Cancel transaction by service
 		if err != nil && transaction != nil {
@@ -61,7 +60,7 @@ func (buc *ManagerUseCase) Transfer(ctx context.Context, idFrom, idTo *string, a
 	if idTo == nil {
 		return nil, domain.TransactionNilDestinationErr
 	}
-	if zerocheker.IsZero(amount) {
+	if amount == 0 {
 		return nil, fmt.Errorf("idFrom = %q ; idFrom = %q ; amount = %f ; %w", *idFrom, *idTo, amount, domain.ChangeBalanceByZeroAmountErr)
 	}
 	if amount < 0 {
@@ -85,7 +84,7 @@ func (buc *ManagerUseCase) Transfer(ctx context.Context, idFrom, idTo *string, a
 	return transaction, err
 }
 
-func (buc *ManagerUseCase) ChangeAmount(ctx context.Context, id *string, amount float32) (transaction *entity.Transaction, err error) {
+func (buc *ManagerUseCase) ChangeAmount(ctx context.Context, id *int64, amount int64) (transaction *entity.Transaction, err error) {
 	defer func() {
 		// Cancel transaction by service
 		if err != nil && transaction != nil {
@@ -95,7 +94,7 @@ func (buc *ManagerUseCase) ChangeAmount(ctx context.Context, id *string, amount 
 	if id == nil {
 		return nil, domain.TransactionNilSourceOrDestinationErr
 	}
-	if zerocheker.IsZero(amount) {
+	if amount == 0 {
 		return nil, fmt.Errorf("idFrom = %q ; amount = %f ; %w", *id, amount, domain.ChangeBalanceByZeroAmountErr)
 	}
 	// Create transaction
@@ -111,7 +110,7 @@ func (buc *ManagerUseCase) ChangeAmount(ctx context.Context, id *string, amount 
 	return transaction, err
 }
 
-func (buc *ManagerUseCase) PayForService(ctx context.Context, id *string, amount float32) (transaction *entity.Transaction, err error) {
+func (buc *ManagerUseCase) PayForService(ctx context.Context, id *int64, amount int64) (transaction *entity.Transaction, err error) {
 	defer func() {
 		// Cancel transaction by service
 		if err != nil && transaction != nil {
@@ -121,7 +120,7 @@ func (buc *ManagerUseCase) PayForService(ctx context.Context, id *string, amount
 	if id == nil {
 		return nil, domain.TransactionNilSourceErr
 	}
-	if zerocheker.IsZero(amount) {
+	if amount == 0 {
 		return nil, fmt.Errorf("idFrom = %q ; amount = %f ; %w", *id, amount, domain.ChangeBalanceByZeroAmountErr)
 	}
 	if amount < 0 {

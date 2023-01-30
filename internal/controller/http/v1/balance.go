@@ -13,15 +13,15 @@ import (
 
 // Converter of currency
 type Converter interface {
-	ConvertFromRUBToCurrency(amount float32, currency string) (float32, error)
+	ConvertFromRUBToCurrency(amount int64, currency string) (int64, error)
 }
 
 // BalanceService is standard useCase for balance
 type BalanceUseCase interface {
-	GetByID(ctx context.Context, id string) (*entity.Balance, error)
-	ChangeAmount(ctx context.Context, id *string, amount float32) error
-	PayForService(ctx context.Context, id *string, amount float32) error
-	Transfer(ctx context.Context, idFrom, idTo *string, amount float32) error
+	GetByID(ctx context.Context, id int64) (*entity.Balance, error)
+	ChangeAmount(ctx context.Context, id *int64, amount int64) error
+	PayForService(ctx context.Context, id *int64, amount int64) error
+	Transfer(ctx context.Context, idFrom, idTo *int64, amount int64) error
 }
 
 type balanceHandler struct {
@@ -40,10 +40,10 @@ func NewBalanceHandler(useCase BalanceUseCase, converter Converter, logger *logg
 
 // GetBalanceByID returns json of balance object or error
 // (GET /balances/{id})
-func (b *balanceHandler) GetBalanceByID(ctx echo.Context, id string, params GetBalanceByIdParams) error {
+func (b *balanceHandler) GetBalanceByID(ctx echo.Context, id int64, params GetBalanceByIdParams) error {
 	balance, err := b.useCase.GetByID(ctx.Request().Context(), id)
 	if err != nil {
-		b.logger.Error("error during getting balance", zap.String("id", id), zap.Error(err))
+		b.logger.Error("error during getting balance", zap.Int64("id", id), zap.Error(err))
 		e := Error{
 			Message: fmt.Sprintf("something went wrong during getting balance by id = %s", id),
 		}
@@ -66,7 +66,8 @@ func (b *balanceHandler) GetBalanceByID(ctx echo.Context, id string, params GetB
 		newAmount, err1 := b.converter.ConvertFromRUBToCurrency(balance.Amount, *params.Currency)
 		if err1 != nil {
 			b.logger.Error("error during balance convert",
-				zap.Float32("amount", balance.Amount),
+				zap.Int64("id", id),
+				zap.Int64("amount", balance.Amount),
 				zap.String("currency", *params.Currency),
 				zap.Error(err1))
 			e := Error{

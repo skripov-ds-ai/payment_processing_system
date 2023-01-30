@@ -32,8 +32,8 @@ func NewExchangeRatesAPI(apiKey string, timeout time.Duration) *ExchangeRatesAPI
 	return &a
 }
 
-func (a *ExchangeRatesAPI) ConvertFromRUBToCurrency(amount float32, currency string) (float32, error) {
-	url := a.createURL(amount, currency)
+func (a *ExchangeRatesAPI) ConvertFromRUBToCurrency(amount int64, currency string) (int64, error) {
+	url := a.createURL(float64(amount)/100, currency)
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return 0, err
@@ -52,9 +52,9 @@ func (a *ExchangeRatesAPI) ConvertFromRUBToCurrency(amount float32, currency str
 	if err != nil {
 		return 0, err
 	}
-	return result.Result, nil
+	return int64(result.Result * 100), nil
 }
 
-func (a *ExchangeRatesAPI) createURL(amount float32, currency string) string {
+func (a *ExchangeRatesAPI) createURL(amount float64, currency string) string {
 	return fmt.Sprintf(a.templateURL, currency, amount)
 }

@@ -1,7 +1,7 @@
 package entity
 
 type Order struct {
-	TransactionID string `json:"transaction_id"`
-	OrderID       string `json:"order_id"`
-	ServiceID     string `json:"service_id"`
+	TransactionID int64 `json:"transaction_id"`
+	OrderID       int64 `json:"order_id"`
+	ServiceID     int64 `json:"service_id"`
 }

@@ -14,13 +14,13 @@ type BalanceServiceTestSuite struct {
 	suite.Suite
 	service *BalanceService
 	storage *mock.BalanceStorage
-	id      string
+	id      int64
 }
 
 func (suite *BalanceServiceTestSuite) SetupTest() {
 	suite.storage = &mock.BalanceStorage{}
 	suite.service = NewBalanceService(suite.storage)
-	suite.id = "example"
+	suite.id = 42
 }
 
 func (suite *BalanceServiceTestSuite) TestGetByID_EqualIDNoError() {
