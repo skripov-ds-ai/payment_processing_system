@@ -3,10 +3,11 @@ package pgx
 import (
 	"context"
 	"fmt"
-	"github.com/shopspring/decimal"
 	"payment_processing_system/internal/domain"
 	"payment_processing_system/internal/domain/entity"
 	"payment_processing_system/pkg/logger"
+
+	"github.com/shopspring/decimal"
 
 	"go.uber.org/zap"
 
@@ -55,7 +56,7 @@ func (bs *balanceStorage) IncreaseAmount(ctx context.Context, id string, amount 
 func (bs *balanceStorage) DecreaseAmount(ctx context.Context, id string, amount decimal.Decimal) error {
 	sql, args, buildErr := bs.queryBuilder.
 		Update(bs.tableScheme).
-		Set("amount", fmt.Sprintf("amount + %f", amount)).
+		Set("amount", fmt.Sprintf("amount + %s", amount.String())).
 		Where(sq.Eq{"id": id}).ToSql()
 	bs.logger.Info("update sql",
 		zap.String("table", bs.tableScheme),
