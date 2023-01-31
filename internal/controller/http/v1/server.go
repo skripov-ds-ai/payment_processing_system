@@ -2,10 +2,15 @@ package v1
 
 import (
 	"github.com/labstack/echo/v4"
+	"payment_processing_system/pkg/logger"
 )
 
 type Server struct {
 	balance *balanceHandler
+}
+
+func NewServer(balanceUseCase ManagerUseCase, converter Converter, logger *logger.Logger) *Server {
+	return &Server{balance: NewBalanceHandler(balanceUseCase, converter, logger)}
 }
 
 // (GET /balances)
@@ -29,7 +34,7 @@ func (s *Server) AccrueOrWriteOffBalance(ctx echo.Context, id int64) error {
 }
 
 // (GET /balances/{id}/transcations)
-func (s *Server) GetBindedTransactions(ctx echo.Context, id string, params GetBindedTransactionsParams) error {
+func (s *Server) GetBindedTransactions(ctx echo.Context, id int64, params GetBindedTransactionsParams) error {
 	return nil
 }
 

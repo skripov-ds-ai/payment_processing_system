@@ -4,22 +4,22 @@ import (
 	"context"
 	"fmt"
 	"payment_processing_system/internal/domain/entity"
+	"payment_processing_system/pkg/db/relational/pgx"
 	"payment_processing_system/pkg/logger"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/jackc/pgx/v5/pgxpool"
 	"go.uber.org/zap"
 )
 
 type transactionStorage struct {
 	tableScheme  string
 	queryBuilder sq.StatementBuilderType
-	pool         *pgxpool.Pool
+	pool         pgx.PgxIface
 	logger       *logger.Logger
 }
 
-func NewTransactionStorage(pool *pgxpool.Pool, logger *logger.Logger) *transactionStorage {
+func NewTransactionStorage(pool pgx.PgxIface, logger *logger.Logger) *transactionStorage {
 	tableScheme := "public.transaction"
 	return &transactionStorage{
 		tableScheme:  tableScheme,

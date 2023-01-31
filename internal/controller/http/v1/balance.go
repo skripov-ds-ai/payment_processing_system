@@ -19,20 +19,20 @@ type Converter interface {
 }
 
 // BalanceService is standard useCase for balance
-type BalanceUseCase interface {
-	GetByID(ctx context.Context, id int64) (*entity.Balance, error)
-	ChangeAmount(ctx context.Context, id *int64, amount decimal.Decimal) error
-	PayForService(ctx context.Context, id *int64, amount decimal.Decimal) error
-	Transfer(ctx context.Context, idFrom, idTo *int64, amount decimal.Decimal) error
+type ManagerUseCase interface {
+	GetBalanceByID(ctx context.Context, id int64) (*entity.Balance, error)
+	//ChangeAmount(ctx context.Context, id *int64, amount decimal.Decimal) error
+	//PayForService(ctx context.Context, id *int64, amount decimal.Decimal) error
+	//Transfer(ctx context.Context, idFrom, idTo *int64, amount decimal.Decimal) error
 }
 
 type balanceHandler struct {
-	useCase   BalanceUseCase
+	useCase   ManagerUseCase
 	converter Converter
 	logger    *logger.Logger
 }
 
-func NewBalanceHandler(useCase BalanceUseCase, converter Converter, logger *logger.Logger) *balanceHandler {
+func NewBalanceHandler(useCase ManagerUseCase, converter Converter, logger *logger.Logger) *balanceHandler {
 	return &balanceHandler{
 		useCase:   useCase,
 		converter: converter,
@@ -43,7 +43,7 @@ func NewBalanceHandler(useCase BalanceUseCase, converter Converter, logger *logg
 // GetBalanceByID returns json of balance object or error
 // (GET /balances/{id})
 func (b *balanceHandler) GetBalanceByID(ctx echo.Context, id int64, params GetBalanceByIdParams) error {
-	balance, err := b.useCase.GetByID(ctx.Request().Context(), id)
+	balance, err := b.useCase.GetBalanceByID(ctx.Request().Context(), id)
 	if err != nil {
 		b.logger.Error("error during getting balance", zap.Int64("id", id), zap.Error(err))
 		e := Error{
