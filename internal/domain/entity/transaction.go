@@ -1,8 +1,9 @@
 package entity
 
 import (
-	decimal "github.com/jackc/pgx-shopspring-decimal"
 	"time"
+
+	decimal "github.com/jackc/pgx-shopspring-decimal"
 )
 
 type (

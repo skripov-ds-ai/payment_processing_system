@@ -3,10 +3,11 @@ package pgx
 import (
 	"context"
 	"fmt"
-	"github.com/jackc/pgx/v5"
 	"log"
 	retry "payment_processing_system/pkg/db"
 	"payment_processing_system/pkg/db/relational"
+
+	"github.com/jackc/pgx/v5"
 
 	pgxdecimal "github.com/jackc/pgx-shopspring-decimal"
 	"github.com/jackc/pgx/v5/pgxpool"

@@ -2,30 +2,33 @@ package converter
 
 import (
 	"fmt"
-	"github.com/shopspring/decimal"
 	"io"
 	"net/http"
 	"time"
 
+	"github.com/shopspring/decimal"
 	jsoniter "github.com/json-iterator/go"
 )
 
-const templateURL = "https://api.apilayer.com/exchangerates_data/convert?to=%s&from=RUB&amount=%s"
+// const templateURL = "https://api.apilayer.com/exchangerates_data/convert?to=%s&from=RUB&amount=%s"
 
-// ExchangeRatesAPI is an example of currency conversion API
+// exchangeRatesAPI is an example of currency conversion API
 // This implementation should not be used in real production! Please, read about decimal values, currency conversions!
 // https://apilayer.com/marketplace/exchangerates_data-api#documentation-tab
-type ExchangeRatesAPI struct {
+type exchangeRatesAPI struct {
 	apiKey      string
+	apiURL      string
 	templateURL string
 	timeout     time.Duration
 	client      *http.Client
 }
 
-func NewExchangeRatesAPI(apiKey string, timeout time.Duration) *ExchangeRatesAPI {
+func NewExchangeRatesAPI(apiKey, apiURL string, timeout time.Duration) *exchangeRatesAPI {
 	client := http.Client{Timeout: timeout}
-	a := ExchangeRatesAPI{
+	templateURL := apiURL + "/convert?to=%s&from=RUB&amount=%s"
+	a := exchangeRatesAPI{
 		apiKey:      apiKey,
+		apiURL:      apiURL,
 		templateURL: templateURL,
 		timeout:     timeout,
 		client:      &client,
@@ -33,11 +36,11 @@ func NewExchangeRatesAPI(apiKey string, timeout time.Duration) *ExchangeRatesAPI
 	return &a
 }
 
-func (a *ExchangeRatesAPI) ConvertFromRUBToCurrency(amount decimal.Decimal, currency string) (decimal.Decimal, error) {
+func (a *exchangeRatesAPI) ConvertFromRUBToCurrency(amount decimal.Decimal, currency string) (decimal.Decimal, error) {
 	url := a.createURL(amount.String(), currency)
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		return 0, err
+		return decimal.Zero, err
 	}
 	req.Header.Set("apikey", a.apiKey)
 	res, err := a.client.Do(req)
@@ -54,9 +57,9 @@ func (a *ExchangeRatesAPI) ConvertFromRUBToCurrency(amount decimal.Decimal, curr
 		return decimal.Zero, err
 	}
 	// TODO
-	return int64(result.Result * 100), nil
+	return result.Result, nil
 }
 
-func (a *ExchangeRatesAPI) createURL(amount string, currency string) string {
+func (a *exchangeRatesAPI) createURL(amount string, currency string) string {
 	return fmt.Sprintf(a.templateURL, currency, amount)
 }
