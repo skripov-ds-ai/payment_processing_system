@@ -48,6 +48,7 @@ func TestConvertFromRUBToCurrency_Success(t *testing.T) {
 	assert.Equal(t, expectedErr, err)
 	assert.Equal(t, expectedResult, result)
 }
+
 func TestConvertFromRUBToCurrency_JSONDecodeError(t *testing.T) {
 	expectedResult := decimal.Zero
 	amount := decimal.NewFromInt(2)
@@ -57,5 +58,15 @@ func TestConvertFromRUBToCurrency_JSONDecodeError(t *testing.T) {
 	converter := NewExchangeRatesAPI("", server.URL, time.Second)
 	result, err := converter.ConvertFromRUBToCurrency(amount, currency)
 	assert.ErrorContains(t, err, "readObjectStart: expect { or n")
+	assert.Equal(t, expectedResult, result)
+}
+
+func TestConvertFromRUBToCurrency_ClientError(t *testing.T) {
+	expectedResult := decimal.Zero
+	amount := decimal.NewFromInt(2)
+	currency := "USD"
+	converter := NewExchangeRatesAPI("", "", time.Second)
+	result, err := converter.ConvertFromRUBToCurrency(amount, currency)
+	assert.ErrorContains(t, err, "unsupported protocol scheme")
 	assert.Equal(t, expectedResult, result)
 }
