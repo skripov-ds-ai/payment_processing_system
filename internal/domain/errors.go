@@ -5,8 +5,8 @@ import (
 )
 
 var (
-	BalanceWasNotIncreased                  = errors.New("balance was not increased")
-	BalanceWasNotDecreased                  = errors.New("balance was not decreased")
+	BalanceWasNotIncreasedErr               = errors.New("balance was not increased")
+	BalanceWasNotDecreasedErr               = errors.New("balance was not decreased")
 	ChangeBalanceByZeroAmountErr            = errors.New("changing balance by zero amount")
 	TransactionSourceDestinationAreEqualErr = errors.New("source and destination of transaction are equal")
 	TransactionNilSourceAndDestinationErr   = errors.New("source and destination of transaction are nil")

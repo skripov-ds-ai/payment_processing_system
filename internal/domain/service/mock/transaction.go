@@ -38,11 +38,11 @@ func (_m *TransactionStorage) Create(ctx context.Context, transaction entity.Tra
 }
 
 // GetByID provides a mock function with given fields: ctx, id
-func (_m *TransactionStorage) GetByID(ctx context.Context, id int64) (*entity.Transaction, error) {
+func (_m *TransactionStorage) GetByID(ctx context.Context, id uint64) (*entity.Transaction, error) {
 	ret := _m.Called(ctx, id)
 
 	var r0 *entity.Transaction
-	if rf, ok := ret.Get(0).(func(context.Context, int64) *entity.Transaction); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uint64) *entity.Transaction); ok {
 		r0 = rf(ctx, id)
 	} else {
 		if ret.Get(0) != nil {
@@ -51,7 +51,7 @@ func (_m *TransactionStorage) GetByID(ctx context.Context, id int64) (*entity.Tr
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, int64) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, uint64) error); ok {
 		r1 = rf(ctx, id)
 	} else {
 		r1 = ret.Error(1)
@@ -61,11 +61,11 @@ func (_m *TransactionStorage) GetByID(ctx context.Context, id int64) (*entity.Tr
 }
 
 // UpdateStatusByID provides a mock function with given fields: ctx, id, status
-func (_m *TransactionStorage) UpdateStatusByID(ctx context.Context, id int64, status entity.TransactionStatus) error {
+func (_m *TransactionStorage) UpdateStatusByID(ctx context.Context, id uint64, status entity.TransactionStatus) error {
 	ret := _m.Called(ctx, id, status)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, int64, entity.TransactionStatus) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uint64, entity.TransactionStatus) error); ok {
 		r0 = rf(ctx, id, status)
 	} else {
 		r0 = ret.Error(0)

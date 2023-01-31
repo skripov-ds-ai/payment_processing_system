@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"payment_processing_system/internal/domain"
 	"payment_processing_system/internal/domain/entity"
+	"payment_processing_system/pkg/db/relational/pgx"
 	"payment_processing_system/pkg/logger"
 
 	"github.com/shopspring/decimal"
@@ -12,17 +13,16 @@ import (
 	"go.uber.org/zap"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type balanceStorage struct {
 	tableScheme  string
 	queryBuilder sq.StatementBuilderType
-	pool         *pgxpool.Pool
+	pool         pgx.PgxIface
 	logger       *logger.Logger
 }
 
-func NewBalanceStorage(pool *pgxpool.Pool, logger *logger.Logger) *balanceStorage {
+func NewBalanceStorage(pool pgx.PgxIface, logger *logger.Logger) *balanceStorage {
 	tableScheme := "public.balance"
 	return &balanceStorage{
 		tableScheme:  tableScheme,
@@ -33,7 +33,7 @@ func NewBalanceStorage(pool *pgxpool.Pool, logger *logger.Logger) *balanceStorag
 }
 
 // TODO
-func (bs *balanceStorage) IncreaseAmount(ctx context.Context, id string, amount decimal.Decimal) error {
+func (bs *balanceStorage) IncreaseAmount(ctx context.Context, id int64, amount decimal.Decimal) error {
 	onConflict := "ON CONFLICT DO UPDATE SET amount = amount + ?"
 	sql, args, buildErr := bs.queryBuilder.
 		Insert(bs.tableScheme).Columns("id", "amount").
@@ -47,13 +47,13 @@ func (bs *balanceStorage) IncreaseAmount(ctx context.Context, id string, amount 
 	}
 	if exec, execErr := bs.pool.Exec(ctx, sql, args...); execErr != nil {
 		return execErr
-	} else if exec.RowsAffected() == 0 || !exec.Insert() {
-		return domain.BalanceWasNotIncreased
+	} else if exec.RowsAffected() == 0 {
+		return domain.BalanceWasNotIncreasedErr
 	}
 	return nil
 }
 
-func (bs *balanceStorage) DecreaseAmount(ctx context.Context, id string, amount decimal.Decimal) error {
+func (bs *balanceStorage) DecreaseAmount(ctx context.Context, id int64, amount decimal.Decimal) error {
 	sql, args, buildErr := bs.queryBuilder.
 		Update(bs.tableScheme).
 		Set("amount", fmt.Sprintf("amount + %s", amount.String())).
@@ -68,12 +68,12 @@ func (bs *balanceStorage) DecreaseAmount(ctx context.Context, id string, amount 
 	if exec, execErr := bs.pool.Exec(ctx, sql, args...); execErr != nil {
 		return execErr
 	} else if exec.RowsAffected() == 0 || !exec.Insert() {
-		return domain.BalanceWasNotDecreased
+		return domain.BalanceWasNotDecreasedErr
 	}
 	return nil
 }
 
-func (bs *balanceStorage) GetByID(ctx context.Context, id string) (*entity.Balance, error) {
+func (bs *balanceStorage) GetByID(ctx context.Context, id int64) (*entity.Balance, error) {
 	sql, args, buildErr := bs.queryBuilder.
 		Select("id", "amount").
 		From(bs.tableScheme).Where(sq.Eq{"id": id}).ToSql()

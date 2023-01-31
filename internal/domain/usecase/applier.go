@@ -49,7 +49,7 @@ func (a *ApplierUseCase) applyTransfer(ctx context.Context, transaction entity.T
 	err := a.bs.ChangeAmount(ctx, *transaction.DestinationID, transaction.Amount)
 	if err != nil {
 		// If destination balance was increased with error then destination balance should be decreased
-		if !errors.Is(err, domain.BalanceWasNotIncreased) {
+		if !errors.Is(err, domain.BalanceWasNotIncreasedErr) {
 			multierr.AppendInto(&err, a.bs.ChangeAmount(ctx, *transaction.DestinationID, transaction.Amount.Neg()))
 		}
 		// Cancel transaction by producer
@@ -60,7 +60,7 @@ func (a *ApplierUseCase) applyTransfer(ctx context.Context, transaction entity.T
 	err = a.bs.ChangeAmount(ctx, *transaction.SourceID, transaction.Amount.Neg())
 	if err != nil {
 		// If source balance was decreased with error then source balance should be increased
-		if !errors.Is(err, domain.BalanceWasNotDecreased) {
+		if !errors.Is(err, domain.BalanceWasNotDecreasedErr) {
 			multierr.AppendInto(&err, a.bs.ChangeAmount(ctx, *transaction.SourceID, transaction.Amount))
 		}
 		// Decrease destination balance
@@ -76,7 +76,7 @@ func (a *ApplierUseCase) applyTransfer(ctx context.Context, transaction entity.T
 func (a *ApplierUseCase) applyIncrease(ctx context.Context, transaction entity.Transaction) error {
 	err := a.bs.ChangeAmount(ctx, *transaction.DestinationID, transaction.Amount)
 	if err != nil {
-		if !errors.Is(err, domain.BalanceWasNotIncreased) {
+		if !errors.Is(err, domain.BalanceWasNotIncreasedErr) {
 			multierr.AppendInto(&err, a.bs.ChangeAmount(ctx, *transaction.DestinationID, transaction.Amount.Neg()))
 		}
 		multierr.AppendInto(&err, a.producer.CancelTransaction(transaction.ID))
@@ -89,7 +89,7 @@ func (a *ApplierUseCase) applyIncrease(ctx context.Context, transaction entity.T
 func (a *ApplierUseCase) applyDecrease(ctx context.Context, transaction entity.Transaction) error {
 	err := a.bs.ChangeAmount(ctx, *transaction.SourceID, transaction.Amount.Neg())
 	if err != nil {
-		if !errors.Is(err, domain.BalanceWasNotDecreased) {
+		if !errors.Is(err, domain.BalanceWasNotDecreasedErr) {
 			multierr.AppendInto(&err, a.bs.ChangeAmount(ctx, *transaction.DestinationID, transaction.Amount))
 		}
 		multierr.AppendInto(&err, a.producer.CancelTransaction(transaction.ID))
@@ -102,7 +102,7 @@ func (a *ApplierUseCase) applyDecrease(ctx context.Context, transaction entity.T
 func (a *ApplierUseCase) applyPayForService(ctx context.Context, transaction entity.Transaction) error {
 	err := a.bs.ChangeAmount(ctx, *transaction.SourceID, transaction.Amount.Neg())
 	if err != nil {
-		if !errors.Is(err, domain.BalanceWasNotDecreased) {
+		if !errors.Is(err, domain.BalanceWasNotDecreasedErr) {
 			multierr.AppendInto(&err, a.bs.ChangeAmount(ctx, *transaction.DestinationID, transaction.Amount))
 		}
 		multierr.AppendInto(&err, a.producer.CancelTransaction(transaction.ID))

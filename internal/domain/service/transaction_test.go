@@ -20,7 +20,7 @@ type TransactionServiceTestSuite struct {
 	testService   *TransactionService
 	testStorage   *mock.TransactionStorage
 	ctx           context.Context
-	id            int64
+	id            uint64
 	transactionID uint64
 }
 
@@ -173,7 +173,7 @@ func (suite *TransactionServiceTestSuite) TestCreateDefaultTransaction() {
 func (suite *TransactionServiceTestSuite) TestGetByID() {
 	testCases := []struct {
 		ctx                 context.Context
-		id                  int64
+		id                  uint64
 		expectedTransaction *entity.Transaction
 		expectedErr         error
 	}{

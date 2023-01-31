@@ -29,7 +29,7 @@ func NewTransactionStorage(pool *pgxpool.Pool, logger *logger.Logger) *transacti
 	}
 }
 
-func (ts *transactionStorage) UpdateStatusByID(ctx context.Context, id, status string) error {
+func (ts *transactionStorage) UpdateStatusByID(ctx context.Context, id uint64, status entity.TransactionStatus) error {
 	sql, args, buildErr := ts.queryBuilder.
 		Update(ts.tableScheme).Set("status", status).
 		Set("date_time_updated", time.Now()).
@@ -79,7 +79,7 @@ func (ts *transactionStorage) Create(ctx context.Context, transaction entity.Tra
 	return &transaction, nil
 }
 
-func (ts *transactionStorage) GetByID(ctx context.Context, id string) (*entity.Transaction, error) {
+func (ts *transactionStorage) GetByID(ctx context.Context, id uint64) (*entity.Transaction, error) {
 	sql, args, buildErr := ts.queryBuilder.
 		Select("id", "source_id", "destination_id", "amount",
 			"ttype", "date_time_created", "date_time_updated", "status").
