@@ -56,7 +56,6 @@ func (a *exchangeRatesAPI) ConvertFromRUBToCurrency(amount decimal.Decimal, curr
 	if err != nil {
 		return decimal.Zero, err
 	}
-	// TODO
 	return result.Result, nil
 }
 
