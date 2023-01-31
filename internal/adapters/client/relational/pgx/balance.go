@@ -3,6 +3,7 @@ package pgx
 import (
 	"context"
 	"fmt"
+	"github.com/shopspring/decimal"
 	"payment_processing_system/internal/domain"
 	"payment_processing_system/internal/domain/entity"
 	"payment_processing_system/pkg/logger"
@@ -30,7 +31,8 @@ func NewBalanceStorage(pool *pgxpool.Pool, logger *logger.Logger) *balanceStorag
 	}
 }
 
-func (bs *balanceStorage) IncreaseAmount(ctx context.Context, id string, amount float32) error {
+// TODO
+func (bs *balanceStorage) IncreaseAmount(ctx context.Context, id string, amount decimal.Decimal) error {
 	onConflict := "ON CONFLICT DO UPDATE SET amount = amount + ?"
 	sql, args, buildErr := bs.queryBuilder.
 		Insert(bs.tableScheme).Columns("id", "amount").
@@ -50,7 +52,7 @@ func (bs *balanceStorage) IncreaseAmount(ctx context.Context, id string, amount 
 	return nil
 }
 
-func (bs *balanceStorage) DecreaseAmount(ctx context.Context, id string, amount float32) error {
+func (bs *balanceStorage) DecreaseAmount(ctx context.Context, id string, amount decimal.Decimal) error {
 	sql, args, buildErr := bs.queryBuilder.
 		Update(bs.tableScheme).
 		Set("amount", fmt.Sprintf("amount + %f", amount)).

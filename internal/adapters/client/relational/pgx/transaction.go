@@ -57,10 +57,10 @@ func (ts *transactionStorage) Create(ctx context.Context, transaction entity.Tra
 	sql, args, buildErr := ts.queryBuilder.
 		Insert(ts.tableScheme).Columns(
 		"amount", "source_id", "destination_id",
-		"type", "date_time_created", "datetime_updated", "status").
+		"ttype", "date_time_created", "datetime_updated", "status").
 		Values(
 			transaction.Amount, transaction.SourceID, transaction.DestinationID,
-			transaction.Type, transaction.DateTimeCreated, transaction.DateTimeUpdated, transaction.Status).
+			transaction.TType, transaction.DateTimeCreated, transaction.DateTimeUpdated, transaction.Status).
 		Suffix("RETURNING \"id\"").
 		ToSql()
 	ts.logger.Info("insert sql",
@@ -82,7 +82,7 @@ func (ts *transactionStorage) Create(ctx context.Context, transaction entity.Tra
 func (ts *transactionStorage) GetByID(ctx context.Context, id string) (*entity.Transaction, error) {
 	sql, args, buildErr := ts.queryBuilder.
 		Select("id", "source_id", "destination_id", "amount",
-			"type", "date_time_created", "date_time_updated", "status").
+			"ttype", "date_time_created", "date_time_updated", "status").
 		From(ts.tableScheme).Where(sq.Eq{"id": id}).ToSql()
 	ts.logger.Info("select sql",
 		zap.String("table", ts.tableScheme),
@@ -99,7 +99,7 @@ func (ts *transactionStorage) GetByID(ctx context.Context, id string) (*entity.T
 		&obj.SourceID,
 		&obj.DestinationID,
 		&obj.Amount,
-		&obj.Type,
+		&obj.TType,
 		&obj.DateTimeCreated,
 		&obj.DateTimeUpdated,
 		&obj.Status)

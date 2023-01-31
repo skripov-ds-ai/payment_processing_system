@@ -20,7 +20,7 @@ type TransactionServiceTestSuite struct {
 	testStorage   *mock.TransactionStorage
 	ctx           context.Context
 	id            int64
-	transactionID int64
+	transactionID uint64
 }
 
 func (suite *TransactionServiceTestSuite) SetupTest() {
@@ -150,7 +150,7 @@ func (suite *TransactionServiceTestSuite) TestCreateDefaultTransaction() {
 				SourceID:        testCase.sourceID,
 				DestinationID:   testCase.destinationID,
 				Amount:          testCase.amount,
-				Type:            testCase.ttype,
+				TType:           testCase.ttype,
 				DateTimeCreated: time.Now(),
 				DateTimeUpdated: time.Now(),
 				Status:          entity.StatusCreated,

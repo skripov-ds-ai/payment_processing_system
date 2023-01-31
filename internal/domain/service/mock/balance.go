@@ -6,6 +6,8 @@ import (
 	context "context"
 	entity "payment_processing_system/internal/domain/entity"
 
+	decimal "github.com/shopspring/decimal"
+
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -15,11 +17,11 @@ type BalanceStorage struct {
 }
 
 // DecreaseAmount provides a mock function with given fields: ctx, id, amount
-func (_m *BalanceStorage) DecreaseAmount(ctx context.Context, id string, amount float32) error {
+func (_m *BalanceStorage) DecreaseAmount(ctx context.Context, id int64, amount decimal.Decimal) error {
 	ret := _m.Called(ctx, id, amount)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, float32) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, int64, decimal.Decimal) error); ok {
 		r0 = rf(ctx, id, amount)
 	} else {
 		r0 = ret.Error(0)
@@ -29,11 +31,11 @@ func (_m *BalanceStorage) DecreaseAmount(ctx context.Context, id string, amount 
 }
 
 // GetByID provides a mock function with given fields: ctx, id
-func (_m *BalanceStorage) GetByID(ctx context.Context, id string) (*entity.Balance, error) {
+func (_m *BalanceStorage) GetByID(ctx context.Context, id int64) (*entity.Balance, error) {
 	ret := _m.Called(ctx, id)
 
 	var r0 *entity.Balance
-	if rf, ok := ret.Get(0).(func(context.Context, string) *entity.Balance); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, int64) *entity.Balance); ok {
 		r0 = rf(ctx, id)
 	} else {
 		if ret.Get(0) != nil {
@@ -42,7 +44,7 @@ func (_m *BalanceStorage) GetByID(ctx context.Context, id string) (*entity.Balan
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, int64) error); ok {
 		r1 = rf(ctx, id)
 	} else {
 		r1 = ret.Error(1)
@@ -52,11 +54,11 @@ func (_m *BalanceStorage) GetByID(ctx context.Context, id string) (*entity.Balan
 }
 
 // IncreaseAmount provides a mock function with given fields: ctx, id, amount
-func (_m *BalanceStorage) IncreaseAmount(ctx context.Context, id string, amount float32) error {
+func (_m *BalanceStorage) IncreaseAmount(ctx context.Context, id int64, amount decimal.Decimal) error {
 	ret := _m.Called(ctx, id, amount)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, float32) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, int64, decimal.Decimal) error); ok {
 		r0 = rf(ctx, id, amount)
 	} else {
 		r0 = ret.Error(0)
