@@ -3,10 +3,12 @@ package pgx
 import (
 	"context"
 	"fmt"
+	"github.com/jackc/pgx/v5"
 	"log"
 	retry "payment_processing_system/pkg/db"
 	"payment_processing_system/pkg/db/relational"
 
+	pgxdecimal "github.com/jackc/pgx-shopspring-decimal"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -32,6 +34,11 @@ func NewClient(ctx context.Context, cfg *relational.SQLConnectConfig, retryCfg *
 		if err != nil {
 			log.Printf("Unable to parse config: %v\n", err)
 			return err
+		}
+		pgxCfg.AfterConnect = func(ctx context.Context, conn *pgx.Conn) error {
+			// do something with every new connection
+			pgxdecimal.Register(conn.TypeMap())
+			return nil
 		}
 
 		pool, err = pgxpool.NewWithConfig(ctx, pgxCfg)

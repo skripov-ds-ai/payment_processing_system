@@ -19,8 +19,8 @@ const (
 
 // Balance defines model for Balance.
 type Balance struct {
-	Amount float32 `json:"amount"`
-	Id     string  `json:"id"`
+	Amount string `json:"amount"`
+	Id     int64  `json:"id"`
 }
 
 // Error defines model for Error.
@@ -30,8 +30,8 @@ type Error struct {
 
 // NewBalance defines model for NewBalance.
 type NewBalance struct {
-	Amount float32 `json:"amount"`
-	Id     string  `json:"id"`
+	Amount string `json:"amount"`
+	Id     int64  `json:"id"`
 }
 
 // FindBalancesParams defines parameters for FindBalances.

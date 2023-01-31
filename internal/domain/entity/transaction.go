@@ -1,6 +1,9 @@
 package entity
 
-import "time"
+import (
+	decimal "github.com/jackc/pgx-shopspring-decimal"
+	"time"
+)
 
 type (
 	TransactionStatus string
@@ -28,7 +31,7 @@ type Transaction struct {
 	ID              int64             `json:"id"`
 	SourceID        *int64            `json:"source_id"`
 	DestinationID   *int64            `json:"destination_id"`
-	Amount          int64             `json:"amount"`
+	Amount          decimal.Decimal   `json:"amount"`
 	Type            TransactionType   `json:"type"`
 	DateTimeCreated time.Time         `json:"date_time_created"`
 	DateTimeUpdated time.Time         `json:"date_time_updated"`

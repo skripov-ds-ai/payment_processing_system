@@ -18,25 +18,25 @@ type ServerInterface interface {
 	FindBalances(ctx echo.Context, params FindBalancesParams) error
 
 	// (POST /balances/{idFrom}/transfer/{idTo})
-	TransferByIds(ctx echo.Context, idFrom string, idTo string) error
+	TransferByIds(ctx echo.Context, idFrom int64, idTo int64) error
 
 	// (GET /balances/{id})
-	GetBalanceById(ctx echo.Context, id string, params GetBalanceByIdParams) error
+	GetBalanceById(ctx echo.Context, id int64, params GetBalanceByIdParams) error
 
 	// (POST /balances/{id})
-	AccrueOrWriteOffBalance(ctx echo.Context, id string) error
+	AccrueOrWriteOffBalance(ctx echo.Context, id int64) error
 
 	// (GET /balances/{id}/transcations)
-	GetBindedTransactions(ctx echo.Context, id string, params GetBindedTransactionsParams) error
+	GetBindedTransactions(ctx echo.Context, id int64, params GetBindedTransactionsParams) error
 
 	// (POST /reservation/balances/{id})
-	ReserveOnSeparateAccount(ctx echo.Context, id string) error
+	ReserveOnSeparateAccount(ctx echo.Context, id int64) error
 
 	// (POST /reservation/balances/{id}/cancel)
-	CancelReservation(ctx echo.Context, id string) error
+	CancelReservation(ctx echo.Context, id int64) error
 
 	// (POST /reservation/balances/{id}/confirm)
-	ConfirmReservation(ctx echo.Context, id string) error
+	ConfirmReservation(ctx echo.Context, id int64) error
 }
 
 // ServerInterfaceWrapper converts echo contexts to parameters.
@@ -80,7 +80,7 @@ func (w *ServerInterfaceWrapper) FindBalances(ctx echo.Context) error {
 func (w *ServerInterfaceWrapper) TransferByIds(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "idFrom" -------------
-	var idFrom string
+	var idFrom int64
 
 	err = runtime.BindStyledParameterWithLocation("simple", false, "idFrom", runtime.ParamLocationPath, ctx.Param("idFrom"), &idFrom)
 	if err != nil {
@@ -88,7 +88,7 @@ func (w *ServerInterfaceWrapper) TransferByIds(ctx echo.Context) error {
 	}
 
 	// ------------- Path parameter "idTo" -------------
-	var idTo string
+	var idTo int64
 
 	err = runtime.BindStyledParameterWithLocation("simple", false, "idTo", runtime.ParamLocationPath, ctx.Param("idTo"), &idTo)
 	if err != nil {
@@ -104,7 +104,7 @@ func (w *ServerInterfaceWrapper) TransferByIds(ctx echo.Context) error {
 func (w *ServerInterfaceWrapper) GetBalanceById(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "id" -------------
-	var id string
+	var id int64
 
 	err = runtime.BindStyledParameterWithLocation("simple", false, "id", runtime.ParamLocationPath, ctx.Param("id"), &id)
 	if err != nil {
@@ -129,7 +129,7 @@ func (w *ServerInterfaceWrapper) GetBalanceById(ctx echo.Context) error {
 func (w *ServerInterfaceWrapper) AccrueOrWriteOffBalance(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "id" -------------
-	var id string
+	var id int64
 
 	err = runtime.BindStyledParameterWithLocation("simple", false, "id", runtime.ParamLocationPath, ctx.Param("id"), &id)
 	if err != nil {
@@ -145,7 +145,7 @@ func (w *ServerInterfaceWrapper) AccrueOrWriteOffBalance(ctx echo.Context) error
 func (w *ServerInterfaceWrapper) GetBindedTransactions(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "id" -------------
-	var id string
+	var id int64
 
 	err = runtime.BindStyledParameterWithLocation("simple", false, "id", runtime.ParamLocationPath, ctx.Param("id"), &id)
 	if err != nil {
@@ -184,7 +184,7 @@ func (w *ServerInterfaceWrapper) GetBindedTransactions(ctx echo.Context) error {
 func (w *ServerInterfaceWrapper) ReserveOnSeparateAccount(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "id" -------------
-	var id string
+	var id int64
 
 	err = runtime.BindStyledParameterWithLocation("simple", false, "id", runtime.ParamLocationPath, ctx.Param("id"), &id)
 	if err != nil {
@@ -200,7 +200,7 @@ func (w *ServerInterfaceWrapper) ReserveOnSeparateAccount(ctx echo.Context) erro
 func (w *ServerInterfaceWrapper) CancelReservation(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "id" -------------
-	var id string
+	var id int64
 
 	err = runtime.BindStyledParameterWithLocation("simple", false, "id", runtime.ParamLocationPath, ctx.Param("id"), &id)
 	if err != nil {
@@ -216,7 +216,7 @@ func (w *ServerInterfaceWrapper) CancelReservation(ctx echo.Context) error {
 func (w *ServerInterfaceWrapper) ConfirmReservation(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "id" -------------
-	var id string
+	var id int64
 
 	err = runtime.BindStyledParameterWithLocation("simple", false, "id", runtime.ParamLocationPath, ctx.Param("id"), &id)
 	if err != nil {
