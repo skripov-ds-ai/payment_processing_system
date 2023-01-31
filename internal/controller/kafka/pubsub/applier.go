@@ -7,5 +7,5 @@ type ApplierUseCase interface {
 }
 
 type ApplierHandler struct {
-	//applier ApplierUseCase
+	// applier ApplierUseCase
 }
