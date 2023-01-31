@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"fmt"
+	"github.com/shopspring/decimal"
 	"go.uber.org/multierr"
 	"payment_processing_system/internal/domain"
 	"payment_processing_system/internal/domain/entity"
@@ -24,7 +25,7 @@ type BalanceGetService interface {
 
 type TransactionGetCreateService interface {
 	GetByID(ctx context.Context, id int64) (*entity.Transaction, error)
-	CreateDefaultTransaction(ctx context.Context, sourceID, destinationID *int64, amount int64, ttype entity.TransactionType) (*entity.Transaction, error)
+	CreateDefaultTransaction(ctx context.Context, sourceID, destinationID *int64, amount decimal.Decimal, ttype entity.TransactionType) (*entity.Transaction, error)
 	CancelByID(ctx context.Context, id int64) error
 }
 
@@ -47,7 +48,7 @@ func (buc *ManagerUseCase) GetBalanceByID(ctx context.Context, id int64) (*entit
 	return buc.bs.GetByID(ctx, id)
 }
 
-func (buc *ManagerUseCase) Transfer(ctx context.Context, idFrom, idTo *int64, amount int64) (transaction *entity.Transaction, err error) {
+func (buc *ManagerUseCase) Transfer(ctx context.Context, idFrom, idTo *int64, amount decimal.Decimal) (transaction *entity.Transaction, err error) {
 	defer func() {
 		// Cancel transaction by service
 		if err != nil && transaction != nil {
@@ -60,10 +61,10 @@ func (buc *ManagerUseCase) Transfer(ctx context.Context, idFrom, idTo *int64, am
 	if idTo == nil {
 		return nil, domain.TransactionNilDestinationErr
 	}
-	if amount == 0 {
+	if amount.IsZero() {
 		return nil, fmt.Errorf("idFrom = %q ; idFrom = %q ; amount = %f ; %w", *idFrom, *idTo, amount, domain.ChangeBalanceByZeroAmountErr)
 	}
-	if amount < 0 {
+	if amount.IsNegative() {
 		return nil, fmt.Errorf("idFrom = %q ; idFrom = %q ; amount = %f ; %w", *idFrom, *idTo, amount, domain.NegativeAmountTransactionErr)
 	}
 	if *idFrom == *idTo {
@@ -84,7 +85,7 @@ func (buc *ManagerUseCase) Transfer(ctx context.Context, idFrom, idTo *int64, am
 	return transaction, err
 }
 
-func (buc *ManagerUseCase) ChangeAmount(ctx context.Context, id *int64, amount int64) (transaction *entity.Transaction, err error) {
+func (buc *ManagerUseCase) ChangeAmount(ctx context.Context, id *int64, amount decimal.Decimal) (transaction *entity.Transaction, err error) {
 	defer func() {
 		// Cancel transaction by service
 		if err != nil && transaction != nil {
@@ -94,14 +95,14 @@ func (buc *ManagerUseCase) ChangeAmount(ctx context.Context, id *int64, amount i
 	if id == nil {
 		return nil, domain.TransactionNilSourceOrDestinationErr
 	}
-	if amount == 0 {
+	if amount.IsZero() {
 		return nil, fmt.Errorf("idFrom = %q ; amount = %f ; %w", *id, amount, domain.ChangeBalanceByZeroAmountErr)
 	}
 	// Create transaction
-	if amount > 0 {
+	if amount.IsPositive() {
 		transaction, err = buc.ts.CreateDefaultTransaction(ctx, nil, id, amount, entity.TypeOuterIncreasing)
 	} else {
-		transaction, err = buc.ts.CreateDefaultTransaction(ctx, id, nil, -amount, entity.TypeOuterDecreasing)
+		transaction, err = buc.ts.CreateDefaultTransaction(ctx, id, nil, amount.Neg(), entity.TypeOuterDecreasing)
 	}
 	// Apply transaction by producer
 	if err == nil {
@@ -110,7 +111,8 @@ func (buc *ManagerUseCase) ChangeAmount(ctx context.Context, id *int64, amount i
 	return transaction, err
 }
 
-func (buc *ManagerUseCase) PayForService(ctx context.Context, id *int64, amount int64) (transaction *entity.Transaction, err error) {
+// TODO: fix amount Sprintfs
+func (buc *ManagerUseCase) PayForService(ctx context.Context, id *int64, amount decimal.Decimal) (transaction *entity.Transaction, err error) {
 	defer func() {
 		// Cancel transaction by service
 		if err != nil && transaction != nil {
@@ -120,10 +122,10 @@ func (buc *ManagerUseCase) PayForService(ctx context.Context, id *int64, amount 
 	if id == nil {
 		return nil, domain.TransactionNilSourceErr
 	}
-	if amount == 0 {
+	if amount.IsZero() {
 		return nil, fmt.Errorf("idFrom = %q ; amount = %f ; %w", *id, amount, domain.ChangeBalanceByZeroAmountErr)
 	}
-	if amount < 0 {
+	if amount.IsNegative() {
 		return nil, fmt.Errorf("idFrom = %q ; amount = %f ; %w", *id, amount, domain.NegativeAmountTransactionErr)
 	}
 	// Check existence of idFrom balance
@@ -133,7 +135,7 @@ func (buc *ManagerUseCase) PayForService(ctx context.Context, id *int64, amount 
 		return nil, err
 	}
 	// Create transaction
-	transaction, err = buc.ts.CreateDefaultTransaction(ctx, id, nil, -amount, entity.TypePayment)
+	transaction, err = buc.ts.CreateDefaultTransaction(ctx, id, nil, amount.Neg(), entity.TypePayment)
 	// Apply transaction by producer
 	if err == nil {
 		err = buc.producer.ApplyTransaction(*transaction)
