@@ -9,6 +9,8 @@ require (
 	github.com/jackc/pgx/v5 v5.2.0
 	github.com/json-iterator/go v1.1.12
 	github.com/labstack/echo/v4 v4.10.0
+	github.com/pashagolub/pgxmock/v2 v2.4.0
+	github.com/pkg/errors v0.9.1
 	github.com/segmentio/kafka-go v0.4.38
 	github.com/shopspring/decimal v1.3.1
 	github.com/stretchr/testify v1.8.1
