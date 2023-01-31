@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/shopspring/decimal"
 	jsoniter "github.com/json-iterator/go"
+	"github.com/shopspring/decimal"
 )
 
 // const templateURL = "https://api.apilayer.com/exchangerates_data/convert?to=%s&from=RUB&amount=%s"
