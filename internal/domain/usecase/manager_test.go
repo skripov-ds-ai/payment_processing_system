@@ -12,13 +12,6 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type mockChainInfo struct {
-	mockService string
-	methodName  string
-	args        []interface{}
-	returnArgs  []interface{}
-}
-
 type ManagerUseCaseTestSuite struct {
 	suite.Suite
 	bs            *mock.BalanceGetService
@@ -35,9 +28,9 @@ func (suite *ManagerUseCaseTestSuite) SetupTest() {
 	suite.ts = &mock.TransactionGetCreateService{}
 	suite.producer = &mock.ApplyTransactionProducer{}
 	suite.useCase = NewManagerUseCase(suite.bs, suite.ts, suite.producer)
-	suite.idFrom = 1         // "example-1"
-	suite.idTo = 2           // "example-2"
-	suite.transactionID = 42 // "transaction-1"
+	suite.idFrom = 1
+	suite.idTo = 2
+	suite.transactionID = 42
 }
 
 func (suite *ManagerUseCaseTestSuite) TestPayForService_Error() {
