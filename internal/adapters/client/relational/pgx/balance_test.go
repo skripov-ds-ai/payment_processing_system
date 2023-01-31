@@ -2,14 +2,15 @@ package pgx
 
 import (
 	"context"
+	"payment_processing_system/internal/domain"
+	"payment_processing_system/pkg/logger"
+	"testing"
+
 	"github.com/pashagolub/pgxmock/v2"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/zap"
-	"payment_processing_system/internal/domain"
-	"payment_processing_system/pkg/logger"
-	"testing"
 )
 
 type BalanceStorageTestSuite struct {
