@@ -2,11 +2,12 @@ package usecase
 
 import (
 	"context"
-	"github.com/stretchr/testify/suite"
 	"payment_processing_system/internal/domain"
 	"payment_processing_system/internal/domain/entity"
 	"payment_processing_system/internal/domain/usecase/mock"
 	"testing"
+
+	"github.com/stretchr/testify/suite"
 )
 
 type ApplierUseCaseTestSuite struct {
