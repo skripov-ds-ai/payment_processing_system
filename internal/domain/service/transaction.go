@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"github.com/shopspring/decimal"
 	"payment_processing_system/internal/domain"
 	"payment_processing_system/internal/domain/entity"
 	"time"
@@ -45,11 +46,11 @@ func (t *TransactionService) CannotApplyByID(ctx context.Context, id int64) erro
 	return t.storage.UpdateStatusByID(ctx, id, entity.StatusCannotApply)
 }
 
-func (t *TransactionService) CreateDefaultTransaction(ctx context.Context, sourceID, destinationID *int64, amount int64, ttype entity.TransactionType) (*entity.Transaction, error) {
-	if amount == 0 {
+func (t *TransactionService) CreateDefaultTransaction(ctx context.Context, sourceID, destinationID *int64, amount decimal.Decimal, ttype entity.TransactionType) (*entity.Transaction, error) {
+	if amount.IsZero() {
 		return nil, domain.ZeroAmountTransactionErr
 	}
-	if amount < 0 {
+	if amount.IsNegative() {
 		return nil, domain.NegativeAmountTransactionErr
 	}
 	if sourceID == nil && destinationID == nil {

@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"github.com/shopspring/decimal"
 	"payment_processing_system/internal/domain"
 	"payment_processing_system/internal/domain/entity"
 	"payment_processing_system/internal/domain/service/mock"
@@ -38,14 +39,14 @@ func (suite *BalanceServiceTestSuite) TestGetByID_EqualIDNoError() {
 
 func (suite *BalanceServiceTestSuite) TestChangeAmount_ByZeroErr() {
 	ctx := context.Background()
-	var amount float32 = 0
+	amount := decimal.Zero
 	err := suite.service.ChangeAmount(ctx, suite.id, amount)
-	suite.ErrorIsf(err, domain.ChangeBalanceByZeroAmountErr, "id = %q ; amount = %f ; %w", suite.id, amount, domain.ChangeBalanceByZeroAmountErr)
+	suite.ErrorIsf(err, domain.ChangeBalanceByZeroAmountErr, "id = %q ; amount = %s ; %w", suite.id, amount.String(), domain.ChangeBalanceByZeroAmountErr)
 }
 
 func (suite *BalanceServiceTestSuite) TestChangeAmount_IncreaseAmount() {
 	ctx := context.Background()
-	var amount float32 = 1
+	amount := decimal.NewFromInt(1)
 	var expectedError error
 	suite.storage.On("IncreaseAmount", ctx, suite.id, amount).
 		Return(expectedError).
@@ -56,9 +57,9 @@ func (suite *BalanceServiceTestSuite) TestChangeAmount_IncreaseAmount() {
 
 func (suite *BalanceServiceTestSuite) TestChangeAmount_DecreaseAmount() {
 	ctx := context.Background()
-	var amount float32 = -1
+	amount := decimal.NewFromInt(-1)
 	var expectedError error
-	suite.storage.On("DecreaseAmount", ctx, suite.id, -amount).
+	suite.storage.On("DecreaseAmount", ctx, suite.id, amount.Neg()).
 		Return(expectedError).
 		Once()
 	err := suite.service.ChangeAmount(ctx, suite.id, amount)

@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"github.com/shopspring/decimal"
 	"payment_processing_system/internal/domain"
 	"payment_processing_system/internal/domain/entity"
 	"payment_processing_system/internal/domain/service/mock"
@@ -18,8 +19,8 @@ type TransactionServiceTestSuite struct {
 	testService   *TransactionService
 	testStorage   *mock.TransactionStorage
 	ctx           context.Context
-	id            string
-	transactionID string
+	id            int64
+	transactionID int64
 }
 
 func (suite *TransactionServiceTestSuite) SetupTest() {
@@ -27,8 +28,8 @@ func (suite *TransactionServiceTestSuite) SetupTest() {
 	suite.testService = NewTransactionService(suite.testStorage)
 
 	suite.ctx = context.Background()
-	suite.id = "example"
-	suite.transactionID = "example-transaction"
+	suite.id = 1            //"example"
+	suite.transactionID = 7 //"example-transaction"
 }
 
 func (suite *TransactionServiceTestSuite) TestCancelByID() {
@@ -81,13 +82,13 @@ func (suite *TransactionServiceTestSuite) TestCreateDefaultTransaction() {
 	defer f.Undo()
 	f.Do()
 
-	sourceID := "a"
-	destinationID := "b"
+	var sourceID int64 = 2      //"a"
+	var destinationID int64 = 3 //"b"
 	testCases := []struct {
 		ctx                   context.Context
-		sourceID              *string
-		destinationID         *string
-		amount                float32
+		sourceID              *int64
+		destinationID         *int64
+		amount                decimal.Decimal
 		ttype                 entity.TransactionType
 		expectedTransaction   *entity.Transaction
 		expectedErr           error
@@ -95,25 +96,25 @@ func (suite *TransactionServiceTestSuite) TestCreateDefaultTransaction() {
 	}{
 		{
 			ctx:                 context.Background(),
-			amount:              0,
+			amount:              decimal.Zero,
 			expectedTransaction: nil,
 			expectedErr:         domain.ZeroAmountTransactionErr,
 		},
 		{
 			ctx:                 context.Background(),
-			amount:              -1,
+			amount:              decimal.NewFromInt(-1),
 			expectedTransaction: nil,
 			expectedErr:         domain.NegativeAmountTransactionErr,
 		},
 		{
 			ctx:                 context.Background(),
-			amount:              1,
+			amount:              decimal.NewFromInt(1),
 			expectedTransaction: nil,
 			expectedErr:         domain.TransactionNilSourceAndDestinationErr,
 		},
 		{
 			ctx:                 context.Background(),
-			amount:              1,
+			amount:              decimal.NewFromInt(1),
 			sourceID:            &sourceID,
 			destinationID:       &sourceID,
 			expectedTransaction: nil,
@@ -121,7 +122,7 @@ func (suite *TransactionServiceTestSuite) TestCreateDefaultTransaction() {
 		},
 		{
 			ctx:                   context.Background(),
-			amount:                1,
+			amount:                decimal.NewFromInt(1),
 			sourceID:              &sourceID,
 			destinationID:         &destinationID,
 			ttype:                 entity.TypeTransfer,
@@ -131,7 +132,7 @@ func (suite *TransactionServiceTestSuite) TestCreateDefaultTransaction() {
 		},
 		{
 			ctx:                   context.Background(),
-			amount:                1,
+			amount:                decimal.NewFromInt(1),
 			sourceID:              &sourceID,
 			destinationID:         &destinationID,
 			ttype:                 entity.TypeTransfer,
@@ -171,21 +172,21 @@ func (suite *TransactionServiceTestSuite) TestCreateDefaultTransaction() {
 func (suite *TransactionServiceTestSuite) TestGetByID() {
 	testCases := []struct {
 		ctx                 context.Context
-		id                  string
+		id                  int64
 		expectedTransaction *entity.Transaction
 		expectedErr         error
 	}{
 		{
 			ctx: context.Background(),
-			id:  "example",
+			id:  4, //"example",
 			expectedTransaction: &entity.Transaction{
-				ID: "example",
+				ID: 4, //"example",
 			},
 			expectedErr: nil,
 		},
 		{
 			ctx:                 context.Background(),
-			id:                  "another-example",
+			id:                  8, //"another-example",
 			expectedTransaction: nil,
 			expectedErr:         errors.New("example error"),
 		},
