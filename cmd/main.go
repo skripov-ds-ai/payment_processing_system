@@ -3,8 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/labstack/echo/v4"
-	"go.uber.org/zap"
 	"payment_processing_system/internal/adapters/client/kafka"
 	pgxinternal "payment_processing_system/internal/adapters/client/relational/pgx"
 	"payment_processing_system/internal/adapters/converter"
@@ -16,6 +14,9 @@ import (
 	"payment_processing_system/pkg/db/relational/pgx"
 	"payment_processing_system/pkg/logger"
 	"time"
+
+	"github.com/labstack/echo/v4"
+	"go.uber.org/zap"
 )
 
 func main() {

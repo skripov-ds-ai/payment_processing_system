@@ -21,9 +21,9 @@ type Converter interface {
 // BalanceService is standard useCase for balance
 type ManagerUseCase interface {
 	GetBalanceByID(ctx context.Context, id int64) (*entity.Balance, error)
-	//ChangeAmount(ctx context.Context, id *int64, amount decimal.Decimal) error
-	//PayForService(ctx context.Context, id *int64, amount decimal.Decimal) error
-	//Transfer(ctx context.Context, idFrom, idTo *int64, amount decimal.Decimal) error
+	// ChangeAmount(ctx context.Context, id *int64, amount decimal.Decimal) error
+	// PayForService(ctx context.Context, id *int64, amount decimal.Decimal) error
+	// Transfer(ctx context.Context, idFrom, idTo *int64, amount decimal.Decimal) error
 }
 
 type balanceHandler struct {

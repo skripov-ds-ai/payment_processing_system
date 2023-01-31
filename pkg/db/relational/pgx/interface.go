@@ -14,8 +14,8 @@ type PgxIface interface {
 	Query(context.Context, string, ...interface{}) (pgx.Rows, error)
 	QueryRow(context.Context, string, ...interface{}) pgx.Row
 	Ping(context.Context) error
-	//Prepare(context.Context, string, string) (*pgconn.StatementDescription, error)
-	//Deallocate(ctx context.Context, name string) error
-	//PgConn() *pgconn.PgConn
+	// Prepare(context.Context, string, string) (*pgconn.StatementDescription, error)
+	// Deallocate(ctx context.Context, name string) error
+	// PgConn() *pgconn.PgConn
 	Close()
 }
