@@ -12,8 +12,6 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-// TODO: rewrite
-
 type mockChainInfo struct {
 	mockService string
 	methodName  string
@@ -40,6 +38,43 @@ func (suite *ManagerUseCaseTestSuite) SetupTest() {
 	suite.idFrom = 1         // "example-1"
 	suite.idTo = 2           // "example-2"
 	suite.transactionID = 42 // "transaction-1"
+}
+
+func (suite *ManagerUseCaseTestSuite) TestPayForService_Error() {
+	var idx = int64(1)
+	testCases := []struct {
+		ctx         context.Context
+		id          *int64
+		amount      decimal.Decimal
+		expectedErr error
+	}{
+		{
+			ctx:         context.Background(),
+			id:          nil,
+			amount:      decimal.NewFromInt(1),
+			expectedErr: domain.TransactionNilSourceErr,
+		},
+		{
+			ctx:         context.Background(),
+			id:          &idx,
+			amount:      decimal.Zero,
+			expectedErr: domain.ChangeBalanceByZeroAmountErr,
+		},
+		{
+			ctx:         context.Background(),
+			id:          &idx,
+			amount:      decimal.NewFromInt(-1),
+			expectedErr: domain.NegativeAmountTransactionErr,
+		},
+	}
+	for _, testCase := range testCases {
+		bs := &mock.BalanceGetService{}
+		ts := &mock.TransactionGetCreateService{}
+		producer := &mock.ApplyTransactionProducer{}
+		useCase := NewManagerUseCase(bs, ts, producer)
+		_, err := useCase.PayForService(testCase.ctx, testCase.id, testCase.amount)
+		suite.ErrorIs(err, testCase.expectedErr)
+	}
 }
 
 func (suite *ManagerUseCaseTestSuite) TestGetByID() {

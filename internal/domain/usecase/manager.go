@@ -40,8 +40,8 @@ func NewManagerUseCase(bs BalanceGetService, ts TransactionGetCreateService, pro
 	return &ManagerUseCase{bs: bs, ts: ts, producer: producer}
 }
 
-// TODO: add GetBalanceTransactions(ctx context.Context, id string) ([]entity.Transaction, error)
-func (buc *ManagerUseCase) GetBalanceTransactions(ctx context.Context, id string) ([]entity.Transaction, error) {
+// TODO: add GetBalanceTransactions(ctx context.Context, id int64) ([]entity.Transaction, error)
+func (buc *ManagerUseCase) GetBalanceTransactions(ctx context.Context, id int64) ([]entity.Transaction, error) {
 	return []entity.Transaction{}, nil
 }
 
@@ -112,7 +112,6 @@ func (buc *ManagerUseCase) ChangeAmount(ctx context.Context, id *int64, amount d
 	return transaction, err
 }
 
-// TODO: fix amount Sprintfs
 func (buc *ManagerUseCase) PayForService(ctx context.Context, id *int64, amount decimal.Decimal) (transaction *entity.Transaction, err error) {
 	defer func() {
 		// Cancel transaction by service
@@ -130,9 +129,12 @@ func (buc *ManagerUseCase) PayForService(ctx context.Context, id *int64, amount 
 		return nil, fmt.Errorf("idFrom = %q ; amount = %s ; %w", *id, amount.String(), domain.NegativeAmountTransactionErr)
 	}
 	// Check existence of idFrom balance
-	_, err = buc.bs.GetByID(ctx, *id)
+	var balance *entity.Balance
+	balance, err = buc.bs.GetByID(ctx, *id)
+	if err == nil && balance == nil {
+		err = domain.TransactionSourceDoesntExistErr
+	}
 	if err != nil {
-		// TODO: wrap by NotFoundErr
 		return nil, err
 	}
 	// Create transaction
