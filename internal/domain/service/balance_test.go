@@ -2,11 +2,12 @@ package service
 
 import (
 	"context"
-	"github.com/shopspring/decimal"
 	"payment_processing_system/internal/domain"
 	"payment_processing_system/internal/domain/entity"
 	"payment_processing_system/internal/domain/service/mock"
 	"testing"
+
+	"github.com/shopspring/decimal"
 
 	"github.com/stretchr/testify/suite"
 )

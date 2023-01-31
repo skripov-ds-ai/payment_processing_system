@@ -2,10 +2,11 @@ package service
 
 import (
 	"context"
-	"github.com/shopspring/decimal"
 	"payment_processing_system/internal/domain"
 	"payment_processing_system/internal/domain/entity"
 	"time"
+
+	"github.com/shopspring/decimal"
 )
 
 type TransactionStorage interface {

@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/shopspring/decimal"
-	//decimal "github.com/jackc/pgx-shopspring-decimal"
+	// decimal "github.com/jackc/pgx-shopspring-decimal"
 )
 
 type (

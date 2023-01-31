@@ -3,10 +3,11 @@ package usecase
 import (
 	"context"
 	"fmt"
-	"github.com/shopspring/decimal"
-	"go.uber.org/multierr"
 	"payment_processing_system/internal/domain"
 	"payment_processing_system/internal/domain/entity"
+
+	"github.com/shopspring/decimal"
+	"go.uber.org/multierr"
 )
 
 // TODO: usecases будут 3 типов

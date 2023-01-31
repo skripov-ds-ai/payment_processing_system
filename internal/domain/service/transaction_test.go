@@ -3,12 +3,13 @@ package service
 import (
 	"context"
 	"errors"
-	"github.com/shopspring/decimal"
 	"payment_processing_system/internal/domain"
 	"payment_processing_system/internal/domain/entity"
 	"payment_processing_system/internal/domain/service/mock"
 	"testing"
 	"time"
+
+	"github.com/shopspring/decimal"
 
 	"github.com/stretchr/testify/suite"
 	"github.com/tkuchiki/faketime"
@@ -28,8 +29,8 @@ func (suite *TransactionServiceTestSuite) SetupTest() {
 	suite.testService = NewTransactionService(suite.testStorage)
 
 	suite.ctx = context.Background()
-	suite.id = 1            //"example"
-	suite.transactionID = 7 //"example-transaction"
+	suite.id = 1            // "example"
+	suite.transactionID = 7 // "example-transaction"
 }
 
 func (suite *TransactionServiceTestSuite) TestCancelByID() {
@@ -82,8 +83,8 @@ func (suite *TransactionServiceTestSuite) TestCreateDefaultTransaction() {
 	defer f.Undo()
 	f.Do()
 
-	var sourceID int64 = 2      //"a"
-	var destinationID int64 = 3 //"b"
+	var sourceID int64 = 2      // "a"
+	var destinationID int64 = 3 // "b"
 	testCases := []struct {
 		ctx                   context.Context
 		sourceID              *int64
@@ -178,15 +179,15 @@ func (suite *TransactionServiceTestSuite) TestGetByID() {
 	}{
 		{
 			ctx: context.Background(),
-			id:  4, //"example",
+			id:  4, // "example",
 			expectedTransaction: &entity.Transaction{
-				ID: 4, //"example",
+				ID: 4, // "example",
 			},
 			expectedErr: nil,
 		},
 		{
 			ctx:                 context.Background(),
-			id:                  8, //"another-example",
+			id:                  8, // "another-example",
 			expectedTransaction: nil,
 			expectedErr:         errors.New("example error"),
 		},

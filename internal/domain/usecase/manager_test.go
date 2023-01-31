@@ -3,12 +3,13 @@ package usecase
 import (
 	"context"
 	"errors"
-	"github.com/shopspring/decimal"
-	"github.com/stretchr/testify/suite"
 	"payment_processing_system/internal/domain"
 	"payment_processing_system/internal/domain/entity"
 	"payment_processing_system/internal/domain/usecase/mock"
 	"testing"
+
+	"github.com/shopspring/decimal"
+	"github.com/stretchr/testify/suite"
 )
 
 // TODO: rewrite
@@ -36,9 +37,9 @@ func (suite *ManagerUseCaseTestSuite) SetupTest() {
 	suite.ts = &mock.TransactionGetCreateService{}
 	suite.producer = &mock.ApplyTransactionProducer{}
 	suite.useCase = NewManagerUseCase(suite.bs, suite.ts, suite.producer)
-	suite.idFrom = 1         //"example-1"
-	suite.idTo = 2           //"example-2"
-	suite.transactionID = 42 //"transaction-1"
+	suite.idFrom = 1         // "example-1"
+	suite.idTo = 2           // "example-2"
+	suite.transactionID = 42 // "transaction-1"
 }
 
 func (suite *ManagerUseCaseTestSuite) TestGetByID() {

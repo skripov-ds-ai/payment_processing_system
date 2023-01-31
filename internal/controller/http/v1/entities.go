@@ -1,8 +1,9 @@
 package v1
 
 import (
-	"github.com/shopspring/decimal"
 	"payment_processing_system/internal/domain/entity"
+
+	"github.com/shopspring/decimal"
 )
 
 func (b *Balance) ToDomain() (*entity.Balance, error) {

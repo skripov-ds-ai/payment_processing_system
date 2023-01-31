@@ -3,10 +3,11 @@ package v1
 import (
 	"context"
 	"fmt"
-	"github.com/shopspring/decimal"
 	"net/http"
 	"payment_processing_system/internal/domain/entity"
 	"payment_processing_system/pkg/logger"
+
+	"github.com/shopspring/decimal"
 
 	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
@@ -46,7 +47,7 @@ func (b *balanceHandler) GetBalanceByID(ctx echo.Context, id int64, params GetBa
 	if err != nil {
 		b.logger.Error("error during getting balance", zap.Int64("id", id), zap.Error(err))
 		e := Error{
-			Message: fmt.Sprintf("something went wrong during getting balance by id = %s", id),
+			Message: fmt.Sprintf("something went wrong during getting balance by id = %d", id),
 		}
 		err1 := ctx.JSON(http.StatusBadRequest, e)
 		if err1 != nil {
