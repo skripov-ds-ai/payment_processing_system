@@ -2,6 +2,7 @@ package converter
 
 import (
 	"fmt"
+	"github.com/shopspring/decimal"
 	"io"
 	"net/http"
 	"time"
@@ -9,7 +10,7 @@ import (
 	jsoniter "github.com/json-iterator/go"
 )
 
-const templateURL = "https://api.apilayer.com/exchangerates_data/convert?to=%s&from=RUB&amount=%.2f"
+const templateURL = "https://api.apilayer.com/exchangerates_data/convert?to=%s&from=RUB&amount=%s"
 
 // ExchangeRatesAPI is an example of currency conversion API
 // This implementation should not be used in real production! Please, read about decimal values, currency conversions!
@@ -32,8 +33,8 @@ func NewExchangeRatesAPI(apiKey string, timeout time.Duration) *ExchangeRatesAPI
 	return &a
 }
 
-func (a *ExchangeRatesAPI) ConvertFromRUBToCurrency(amount int64, currency string) (int64, error) {
-	url := a.createURL(float64(amount)/100, currency)
+func (a *ExchangeRatesAPI) ConvertFromRUBToCurrency(amount decimal.Decimal, currency string) (decimal.Decimal, error) {
+	url := a.createURL(amount.String(), currency)
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return 0, err
@@ -41,20 +42,21 @@ func (a *ExchangeRatesAPI) ConvertFromRUBToCurrency(amount int64, currency strin
 	req.Header.Set("apikey", a.apiKey)
 	res, err := a.client.Do(req)
 	if err != nil {
-		return 0, err
+		return decimal.Zero, err
 	}
 	var result apiResult
 	bs, err := io.ReadAll(res.Body)
 	if err != nil {
-		return 0, err
+		return decimal.Zero, err
 	}
 	err = jsoniter.Unmarshal(bs, &result)
 	if err != nil {
-		return 0, err
+		return decimal.Zero, err
 	}
+	// TODO
 	return int64(result.Result * 100), nil
 }
 
-func (a *ExchangeRatesAPI) createURL(amount float64, currency string) string {
+func (a *ExchangeRatesAPI) createURL(amount string, currency string) string {
 	return fmt.Sprintf(a.templateURL, currency, amount)
 }

@@ -3,6 +3,7 @@ package v1
 import (
 	"context"
 	"fmt"
+	"github.com/shopspring/decimal"
 	"net/http"
 	"payment_processing_system/internal/domain/entity"
 	"payment_processing_system/pkg/logger"
@@ -13,15 +14,15 @@ import (
 
 // Converter of currency
 type Converter interface {
-	ConvertFromRUBToCurrency(amount int64, currency string) (int64, error)
+	ConvertFromRUBToCurrency(amount decimal.Decimal, currency string) (decimal.Decimal, error)
 }
 
 // BalanceService is standard useCase for balance
 type BalanceUseCase interface {
 	GetByID(ctx context.Context, id int64) (*entity.Balance, error)
-	ChangeAmount(ctx context.Context, id *int64, amount int64) error
-	PayForService(ctx context.Context, id *int64, amount int64) error
-	Transfer(ctx context.Context, idFrom, idTo *int64, amount int64) error
+	ChangeAmount(ctx context.Context, id *int64, amount decimal.Decimal) error
+	PayForService(ctx context.Context, id *int64, amount decimal.Decimal) error
+	Transfer(ctx context.Context, idFrom, idTo *int64, amount decimal.Decimal) error
 }
 
 type balanceHandler struct {
@@ -67,7 +68,7 @@ func (b *balanceHandler) GetBalanceByID(ctx echo.Context, id int64, params GetBa
 		if err1 != nil {
 			b.logger.Error("error during balance convert",
 				zap.Int64("id", id),
-				zap.Int64("amount", balance.Amount),
+				zap.String("amount", balance.Amount.String()),
 				zap.String("currency", *params.Currency),
 				zap.Error(err1))
 			e := Error{
