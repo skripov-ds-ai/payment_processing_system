@@ -12,7 +12,6 @@ import (
 )
 
 func TestConvertFromRUBToCurrency_Success(t *testing.T) {
-	// decimal.MarshalJSONWithoutQuotes = true
 	var expectedErr error
 	expectedResult, e := decimal.NewFromString("6.4")
 	if e != nil {
@@ -50,7 +49,6 @@ func TestConvertFromRUBToCurrency_Success(t *testing.T) {
 	assert.Equal(t, expectedResult, result)
 }
 func TestConvertFromRUBToCurrency_JSONDecodeError(t *testing.T) {
-	// decimal.MarshalJSONWithoutQuotes = true
 	expectedResult := decimal.Zero
 	amount := decimal.NewFromInt(2)
 	currency := "JPY"
