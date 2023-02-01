@@ -45,7 +45,7 @@ jobs:
         run: |
           go test -v -race -coverpkg=./... -coverprofile=coverage.out -covermode=atomic ./...
       - name: Clean test coverage
-        run: cat ./coverage.out | grep -v -e "_easyjson.go" -e "cmd" -e "mock" -e "http/v1/router.go" > cover.out
+        run: cat ./coverage.out | grep -v -e "_easyjson.go" -e "cmd" -e "mock" -e "http/v1/router.go" -e "http/v1/swagger.go" > cover.out
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
