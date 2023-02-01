@@ -14,11 +14,6 @@ func NewServer(balanceUseCase ManagerUseCase, converter Converter, logger *logge
 	return &Server{manager: NewBalanceHandler(balanceUseCase, converter, logger)}
 }
 
-// (GET /balances)
-func (s *Server) FindBalances(ctx echo.Context, params FindBalancesParams) error {
-	return nil
-}
-
 // (POST /balances/{idFrom}/transfer/{idTo})
 func (s *Server) TransferByIds(ctx echo.Context, idFrom, idTo int64) error {
 	return s.manager.TransferByIds(ctx, idFrom, idTo)

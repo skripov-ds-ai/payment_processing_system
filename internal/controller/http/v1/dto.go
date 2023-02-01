@@ -7,18 +7,11 @@ import (
 	"time"
 )
 
-// Defines values for FindBalancesParamsSort.
-const (
-	FindBalancesParamsSortDate FindBalancesParamsSort = "date"
-	FindBalancesParamsSortId   FindBalancesParamsSort = "id"
-	FindBalancesParamsSortSum  FindBalancesParamsSort = "sum"
-)
-
 // Defines values for GetBindedTransactionsParamsSort.
 const (
-	GetBindedTransactionsParamsSortAmount GetBindedTransactionsParamsSort = "amount"
-	GetBindedTransactionsParamsSortDate   GetBindedTransactionsParamsSort = "date"
-	GetBindedTransactionsParamsSortId     GetBindedTransactionsParamsSort = "id"
+	Amount GetBindedTransactionsParamsSort = "amount"
+	Date   GetBindedTransactionsParamsSort = "date"
+	Id     GetBindedTransactionsParamsSort = "id"
 )
 
 // Balance defines model for Balance.
@@ -36,6 +29,18 @@ type Error struct {
 type NewBalance struct {
 	Amount string `json:"amount"`
 	Id     int64  `json:"id"`
+}
+
+// NewTransaction defines model for NewTransaction.
+type NewTransaction struct {
+	Amount          string    `json:"amount"`
+	DateTimeCreated time.Time `json:"date_time_created"`
+	DateTimeUpdated time.Time `json:"date_time_updated"`
+	DestinationId   *int64    `json:"destination_id"`
+	Id              uint64    `json:"id"`
+	SourceId        *int64    `json:"source_id"`
+	Status          string    `json:"status"`
+	Ttype           string    `json:"ttype"`
 }
 
 // Transaction defines model for Transaction.
@@ -62,24 +67,9 @@ type Transactions = []struct {
 	Ttype           string    `json:"ttype"`
 }
 
-// FindBalancesParams defines parameters for FindBalances.
-type FindBalancesParams struct {
-	// Sort key to sort by - id, date, sum
-	Sort *FindBalancesParamsSort `form:"sort,omitempty" json:"sort,omitempty"`
-
-	// Limit maximum number of results to return
-	Limit *uint64 `form:"limit,omitempty" json:"limit,omitempty"`
-
-	// Page page of collection
-	Page *uint64 `form:"page,omitempty" json:"page,omitempty"`
-}
-
-// FindBalancesParamsSort defines parameters for FindBalances.
-type FindBalancesParamsSort string
-
 // GetBalanceByIdParams defines parameters for GetBalanceById.
 type GetBalanceByIdParams struct {
-	// Currency Currency to display manager
+	// Currency Currency to display balance
 	Currency *string `form:"currency,omitempty" json:"currency,omitempty"`
 }
 

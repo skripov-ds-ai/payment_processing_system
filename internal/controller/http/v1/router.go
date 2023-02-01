@@ -14,9 +14,6 @@ import (
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 
-	// (GET /balances)
-	FindBalances(ctx echo.Context, params FindBalancesParams) error
-
 	// (POST /balances/{idFrom}/transfer/{idTo})
 	TransferByIds(ctx echo.Context, idFrom int64, idTo int64) error
 
@@ -42,38 +39,6 @@ type ServerInterface interface {
 // ServerInterfaceWrapper converts echo contexts to parameters.
 type ServerInterfaceWrapper struct {
 	Handler ServerInterface
-}
-
-// FindBalances converts echo context to params.
-func (w *ServerInterfaceWrapper) FindBalances(ctx echo.Context) error {
-	var err error
-
-	// Parameter object where we will unmarshal all parameters from the context
-	var params FindBalancesParams
-	// ------------- Optional query parameter "sort" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "sort", ctx.QueryParams(), &params.Sort)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter sort: %s", err))
-	}
-
-	// ------------- Optional query parameter "limit" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "limit", ctx.QueryParams(), &params.Limit)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter limit: %s", err))
-	}
-
-	// ------------- Optional query parameter "page" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "page", ctx.QueryParams(), &params.Page)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter page: %s", err))
-	}
-
-	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.FindBalances(ctx, params)
-	return err
 }
 
 // TransferByIds converts echo context to params.
@@ -256,7 +221,6 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 		Handler: si,
 	}
 
-	router.GET(baseURL+"/balances", wrapper.FindBalances)
 	router.POST(baseURL+"/balances/:idFrom/transfer/:idTo", wrapper.TransferByIds)
 	router.GET(baseURL+"/balances/:id", wrapper.GetBalanceById)
 	router.POST(baseURL+"/balances/:id", wrapper.AccrueOrWriteOffBalance)

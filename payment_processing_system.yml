@@ -12,48 +12,48 @@ info:
 servers:
   - url: http://localhost:8080/api
 paths:
-  /balances:
-    get:
-      description: |
-        Returns all balances from the system.
-      operationId: findBalances
-      parameters:
-        - name: sort
-          in: query
-          description: key to sort by - id, date, amount
-          required: false
-          schema:
-            type: string
-            enum: ["id", "date", "amount"]
-        - name: limit
-          in: query
-          description: maximum number of results to return
-          required: false
-          schema:
-            type: integer
-            format: uint64
-        - name: page
-          in: query
-          description: page of collection
-          required: false
-          schema:
-            type: integer
-            format: uint64
-      responses:
-        '200':
-          description: balance response
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Balance'
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+#  /balances:
+#    get:
+#      description: |
+#        Returns all balances from the system.
+#      operationId: findBalances
+#      parameters:
+#        - name: sort
+#          in: query
+#          description: key to sort by - id, date, amount
+#          required: false
+#          schema:
+#            type: string
+#            enum: ["id", "date", "amount"]
+#        - name: limit
+#          in: query
+#          description: maximum number of results to return
+#          required: false
+#          schema:
+#            type: integer
+#            format: uint64
+#        - name: page
+#          in: query
+#          description: page of collection
+#          required: false
+#          schema:
+#            type: integer
+#            format: uint64
+#      responses:
+#        '200':
+#          description: balance response
+#          content:
+#            application/json:
+#              schema:
+#                type: array
+#                items:
+#                  $ref: '#/components/schemas/Balance'
+#        default:
+#          description: unexpected error
+#          content:
+#            application/json:
+#              schema:
+#                $ref: '#/components/schemas/Error'
   /balances/{idFrom}/transfer/{idTo}:
     post:
       description: Transfer money from idFrom balance to idTo balance

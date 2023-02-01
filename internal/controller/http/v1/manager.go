@@ -121,6 +121,7 @@ func (m *managerHandler) AccrueOrWriteOffBalance(ctx echo.Context, id int64) err
 	return nil
 }
 
+// TODO: fix page/offset work
 // (GET /balances/{id}/transcations)
 func (m *managerHandler) GetBindedTransactions(ctx echo.Context, id int64, params GetBindedTransactionsParams) error {
 	// TODO: add validation by validator
