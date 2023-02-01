@@ -66,7 +66,7 @@ func main() {
 	swagger, err := v1.GetSwagger()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error loading swagger spec\n: %s", err)
-		os.Exit(1)
+		return
 	}
 	// Clear out the servers array in the swagger spec, that skips validating
 	// that server names match. We don't know how this thing will be run.
@@ -91,7 +91,7 @@ func main() {
 
 	// graceful shutdown
 	sigs := make(chan os.Signal, 1)
-	signal.Notify(sigs, syscall.SIGKILL, syscall.SIGTERM)
+	signal.Notify(sigs, syscall.SIGTERM)
 	<-sigs
 
 	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
