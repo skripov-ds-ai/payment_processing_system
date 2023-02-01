@@ -17,7 +17,7 @@ import (
 // 3) Внутренний(kafka) - получение событий, (R) transaction, изменение(U) transaction
 
 type ApplyTransactionProducer interface {
-	ApplyTransaction(transaction entity.Transaction) error
+	ApplyTransaction(ctx context.Context, transaction entity.Transaction) error
 }
 
 type BalanceGetService interface {

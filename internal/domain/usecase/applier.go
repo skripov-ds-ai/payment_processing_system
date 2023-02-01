@@ -12,8 +12,8 @@ import (
 )
 
 type ConfirmTransactionProducer interface {
-	CancelTransaction(id uint64) error
-	CompleteTransaction(id uint64) error
+	CancelTransaction(ctx context.Context, id uint64) error
+	CompleteTransaction(ctx context.Context, id uint64) error
 }
 
 type BalanceGetChangeService interface {
