@@ -20,11 +20,11 @@ paths:
       parameters:
         - name: sort
           in: query
-          description: key to sort by - id, date, sum
+          description: key to sort by - id, date, amount
           required: false
           schema:
             type: string
-            enum: ["id", "date", "sum"]
+            enum: ["id", "date", "amount"]
         - name: limit
           in: query
           description: maximum number of results to return
@@ -121,7 +121,7 @@ paths:
             format: uint64
       responses:
         '200':
-          description: pet response
+          description: transactions of the balance response
           content:
             application/json:
               schema:
@@ -227,7 +227,7 @@ paths:
             type: string
       responses:
         '200':
-          description: pet response
+          description: balance response
           content:
             application/json:
               schema:
@@ -250,7 +250,7 @@ paths:
             type: integer
             format: int64
       requestBody:
-        description: Pet to add to the store
+        description: amount to change the balance
         required: true
         content:
           application/json:
@@ -258,11 +258,11 @@ paths:
               $ref: '#/components/schemas/NewBalance'
       responses:
         '200':
-          description: balance response
+          description: new transaction response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Balance'
+                $ref: '#/components/schemas/NewTransaction'
         default:
           description: unexpected error
           content:
@@ -277,7 +277,7 @@ components:
         allOf:
           - $ref: '#/components/schemas/Transaction'
           - type: object
-    Transaction:
+    NewTransaction:
       type: object
       required:
         - id
@@ -313,6 +313,10 @@ components:
           format: date-time
         status:
           type: string
+    Transaction:
+      allOf:
+        - $ref: '#/components/schemas/NewTransaction'
+        - type: object
     Balance:
       allOf:
         - $ref: '#/components/schemas/NewBalance'
