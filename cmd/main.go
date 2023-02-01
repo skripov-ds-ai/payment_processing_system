@@ -15,6 +15,7 @@ import (
 	"payment_processing_system/pkg/db"
 	"payment_processing_system/pkg/db/relational"
 	"payment_processing_system/pkg/db/relational/pgx"
+	"payment_processing_system/pkg/kafka/pubsub"
 	"payment_processing_system/pkg/logger"
 	"syscall"
 	"time"
@@ -55,7 +56,10 @@ func main() {
 	bService := service.NewBalanceService(bStorage)
 	tService := service.NewTransactionService(tStorage)
 
-	producer := kafka.NewApplyTransactionProducer()
+	// TODO
+	address := make([]string, 0)
+	kafkaPubSub := pubsub.NewProducer(address, log)
+	producer := kafka.NewApplyTransactionProducer("apply", kafkaPubSub)
 
 	managerUseCase := usecase.NewManagerUseCase(bService, tService, producer)
 
