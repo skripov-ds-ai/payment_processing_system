@@ -2,11 +2,12 @@ package kafka
 
 import (
 	"context"
-	jsoniter "github.com/json-iterator/go"
-	"github.com/segmentio/kafka-go"
 	"payment_processing_system/internal/domain/entity"
 	"payment_processing_system/pkg/kafka/pubsub"
 	"time"
+
+	jsoniter "github.com/json-iterator/go"
+	"github.com/segmentio/kafka-go"
 )
 
 type ApplyTransactionProducer struct {

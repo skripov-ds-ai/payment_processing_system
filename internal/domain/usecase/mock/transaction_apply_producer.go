@@ -3,6 +3,7 @@
 package mock
 
 import (
+	context "context"
 	entity "payment_processing_system/internal/domain/entity"
 
 	mock "github.com/stretchr/testify/mock"
@@ -13,13 +14,13 @@ type ApplyTransactionProducer struct {
 	mock.Mock
 }
 
-// ApplyTransaction provides a mock function with given fields: transaction
-func (_m *ApplyTransactionProducer) ApplyTransaction(transaction entity.Transaction) error {
-	ret := _m.Called(transaction)
+// ApplyTransaction provides a mock function with given fields: ctx, transaction
+func (_m *ApplyTransactionProducer) ApplyTransaction(ctx context.Context, transaction entity.Transaction) error {
+	ret := _m.Called(ctx, transaction)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(entity.Transaction) error); ok {
-		r0 = rf(transaction)
+	if rf, ok := ret.Get(0).(func(context.Context, entity.Transaction) error); ok {
+		r0 = rf(ctx, transaction)
 	} else {
 		r0 = ret.Error(0)
 	}

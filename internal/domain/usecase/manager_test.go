@@ -260,7 +260,7 @@ func (suite *ManagerUseCaseTestSuite) TestChangeAmount_Success() {
 		ts.On("CreateDefaultTransaction", testCase.ctx, testCase.idFrom,
 			testCase.idTo, tsAmount, testCase.transactionType).
 			Return(&testCase.transaction, testCase.expectedErr).Once()
-		producer.On("ApplyTransaction", testCase.transaction).
+		producer.On("ApplyTransaction", testCase.ctx, testCase.transaction).
 			Return(testCase.expectedErr).Once()
 		transaction, err := useCase.ChangeAmount(testCase.ctx, bsChangeID, testCase.amount)
 		suite.Equal(testCase.expectedErr, err)
@@ -377,7 +377,7 @@ func (suite *ManagerUseCaseTestSuite) TestTransfer_TransferNoError() {
 		ctx, suite.idFrom, amount.Neg()).Return(expectedErr).Once()
 	suite.ts.On("CompletedByID",
 		ctx, transaction.ID).Return(expectedErr).Once()
-	suite.producer.On("ApplyTransaction", transaction).
+	suite.producer.On("ApplyTransaction", ctx, transaction).
 		Return(expectedErr).Once()
 	_, err := suite.useCase.Transfer(ctx, &suite.idFrom, &suite.idTo, amount)
 	suite.Equal(expectedErr, err)

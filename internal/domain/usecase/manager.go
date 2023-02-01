@@ -91,7 +91,7 @@ func (buc *ManagerUseCase) Transfer(ctx context.Context, idFrom, idTo *int64, am
 	transaction, err = buc.ts.CreateDefaultTransaction(ctx, idFrom, idTo, amount, entity.TypeTransfer)
 	// Apply transaction by producer
 	if err == nil {
-		err = buc.producer.ApplyTransaction(*transaction)
+		err = buc.producer.ApplyTransaction(ctx, *transaction)
 	}
 	return transaction, err
 }
@@ -117,7 +117,7 @@ func (buc *ManagerUseCase) ChangeAmount(ctx context.Context, id *int64, amount d
 	}
 	// Apply transaction by producer
 	if err == nil {
-		err = buc.producer.ApplyTransaction(*transaction)
+		err = buc.producer.ApplyTransaction(ctx, *transaction)
 	}
 	return transaction, err
 }
@@ -151,7 +151,7 @@ func (buc *ManagerUseCase) PayForService(ctx context.Context, id *int64, amount 
 	transaction, err = buc.ts.CreateDefaultTransaction(ctx, id, nil, amount.Neg(), entity.TypePayment)
 	// Apply transaction by producer
 	if err == nil {
-		err = buc.producer.ApplyTransaction(*transaction)
+		err = buc.producer.ApplyTransaction(ctx, *transaction)
 	}
 	return transaction, err
 }

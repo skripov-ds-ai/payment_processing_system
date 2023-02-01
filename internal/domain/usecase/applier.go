@@ -53,7 +53,7 @@ func (a *ApplierUseCase) applyTransfer(ctx context.Context, transaction entity.T
 			multierr.AppendInto(&err, a.bs.ChangeAmount(ctx, *transaction.DestinationID, transaction.Amount.Neg()))
 		}
 		// Cancel transaction by producer
-		multierr.AppendInto(&err, a.producer.CancelTransaction(transaction.ID))
+		multierr.AppendInto(&err, a.producer.CancelTransaction(ctx, transaction.ID))
 		return err
 	}
 	// Decrease source balance
@@ -66,10 +66,10 @@ func (a *ApplierUseCase) applyTransfer(ctx context.Context, transaction entity.T
 		// Decrease destination balance
 		multierr.AppendInto(&err, a.bs.ChangeAmount(ctx, *transaction.DestinationID, transaction.Amount.Neg()))
 		// Cancel transaction by producer
-		multierr.AppendInto(&err, a.producer.CancelTransaction(transaction.ID))
+		multierr.AppendInto(&err, a.producer.CancelTransaction(ctx, transaction.ID))
 		return err
 	}
-	err = a.producer.CompleteTransaction(transaction.ID)
+	err = a.producer.CompleteTransaction(ctx, transaction.ID)
 	return err
 }
 
@@ -79,10 +79,10 @@ func (a *ApplierUseCase) applyIncrease(ctx context.Context, transaction entity.T
 		if !errors.Is(err, domain.BalanceWasNotIncreasedErr) {
 			multierr.AppendInto(&err, a.bs.ChangeAmount(ctx, *transaction.DestinationID, transaction.Amount.Neg()))
 		}
-		multierr.AppendInto(&err, a.producer.CancelTransaction(transaction.ID))
+		multierr.AppendInto(&err, a.producer.CancelTransaction(ctx, transaction.ID))
 		return err
 	}
-	err = a.producer.CompleteTransaction(transaction.ID)
+	err = a.producer.CompleteTransaction(ctx, transaction.ID)
 	return err
 }
 
@@ -92,10 +92,10 @@ func (a *ApplierUseCase) applyDecrease(ctx context.Context, transaction entity.T
 		if !errors.Is(err, domain.BalanceWasNotDecreasedErr) {
 			multierr.AppendInto(&err, a.bs.ChangeAmount(ctx, *transaction.DestinationID, transaction.Amount))
 		}
-		multierr.AppendInto(&err, a.producer.CancelTransaction(transaction.ID))
+		multierr.AppendInto(&err, a.producer.CancelTransaction(ctx, transaction.ID))
 		return err
 	}
-	err = a.producer.CompleteTransaction(transaction.ID)
+	err = a.producer.CompleteTransaction(ctx, transaction.ID)
 	return err
 }
 
@@ -105,9 +105,9 @@ func (a *ApplierUseCase) applyPayForService(ctx context.Context, transaction ent
 		if !errors.Is(err, domain.BalanceWasNotDecreasedErr) {
 			multierr.AppendInto(&err, a.bs.ChangeAmount(ctx, *transaction.DestinationID, transaction.Amount))
 		}
-		multierr.AppendInto(&err, a.producer.CancelTransaction(transaction.ID))
+		multierr.AppendInto(&err, a.producer.CancelTransaction(ctx, transaction.ID))
 		return err
 	}
-	err = a.producer.CompleteTransaction(transaction.ID)
+	err = a.producer.CompleteTransaction(ctx, transaction.ID)
 	return err
 }

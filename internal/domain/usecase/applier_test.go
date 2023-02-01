@@ -75,6 +75,7 @@ func (suite *ApplierUseCaseTestSuite) TestApplyTransaction_Success() {
 					mockService: "producer",
 					methodName:  "CompleteTransaction",
 					args: []interface{}{
+						context.Background(),
 						transaction1.ID,
 					},
 					returnArgs: []interface{}{
@@ -104,6 +105,7 @@ func (suite *ApplierUseCaseTestSuite) TestApplyTransaction_Success() {
 					mockService: "producer",
 					methodName:  "CompleteTransaction",
 					args: []interface{}{
+						context.Background(),
 						transaction2.ID,
 					},
 					returnArgs: []interface{}{
@@ -133,6 +135,7 @@ func (suite *ApplierUseCaseTestSuite) TestApplyTransaction_Success() {
 					mockService: "producer",
 					methodName:  "CompleteTransaction",
 					args: []interface{}{
+						context.Background(),
 						transaction3.ID,
 					},
 					returnArgs: []interface{}{
