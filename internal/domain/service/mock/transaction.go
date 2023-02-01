@@ -37,6 +37,29 @@ func (_m *TransactionStorage) Create(ctx context.Context, transaction entity.Tra
 	return r0, r1
 }
 
+// GetBalanceTransactions provides a mock function with given fields: ctx, balanceID, limit, offset, orderBy
+func (_m *TransactionStorage) GetBalanceTransactions(ctx context.Context, balanceID int64, limit uint64, offset uint64, orderBy string) ([]*entity.Transaction, error) {
+	ret := _m.Called(ctx, balanceID, limit, offset, orderBy)
+
+	var r0 []*entity.Transaction
+	if rf, ok := ret.Get(0).(func(context.Context, int64, uint64, uint64, string) []*entity.Transaction); ok {
+		r0 = rf(ctx, balanceID, limit, offset, orderBy)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*entity.Transaction)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, int64, uint64, uint64, string) error); ok {
+		r1 = rf(ctx, balanceID, limit, offset, orderBy)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetByID provides a mock function with given fields: ctx, id
 func (_m *TransactionStorage) GetByID(ctx context.Context, id uint64) (*entity.Transaction, error) {
 	ret := _m.Called(ctx, id)

@@ -42,7 +42,7 @@ func NewManagerUseCase(bs BalanceGetService, ts TransactionGetCreateService, pro
 }
 
 // TODO: rewrite to use All() with filters, orderings, limit, offset in storage
-// TODO: add check existance of balance by balanceID before query
+// TODO: add check existence of balance by balanceID before query
 func (buc *ManagerUseCase) GetBalanceTransactions(ctx context.Context, balanceID int64, limit, offset uint64, orderBy string) ([]*entity.Transaction, error) {
 	balance, err := buc.bs.GetByID(ctx, balanceID)
 	if err != nil {
