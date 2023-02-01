@@ -28,6 +28,7 @@ type TransactionGetCreateService interface {
 	GetByID(ctx context.Context, id uint64) (*entity.Transaction, error)
 	CreateDefaultTransaction(ctx context.Context, sourceID, destinationID *int64, amount decimal.Decimal, ttype entity.TransactionType) (*entity.Transaction, error)
 	CancelByID(ctx context.Context, id uint64) error
+	GetBalanceTransactions(ctx context.Context, balanceID int64, limit, offset uint64, orderBy string) ([]*entity.Transaction, error)
 }
 
 type ManagerUseCase struct {
@@ -40,9 +41,18 @@ func NewManagerUseCase(bs BalanceGetService, ts TransactionGetCreateService, pro
 	return &ManagerUseCase{bs: bs, ts: ts, producer: producer}
 }
 
-// TODO: add GetBalanceTransactions(ctx context.Context, id int64) ([]entity.Transaction, error)
-func (buc *ManagerUseCase) GetBalanceTransactions(ctx context.Context, id int64) ([]entity.Transaction, error) {
-	return []entity.Transaction{}, nil
+// TODO: rewrite to use All() with filters, orderings, limit, offset in storage
+// TODO: add check existance of balance by balanceID before query
+func (buc *ManagerUseCase) GetBalanceTransactions(ctx context.Context, balanceID int64, limit, offset uint64, orderBy string) ([]*entity.Transaction, error) {
+	balance, err := buc.bs.GetByID(ctx, balanceID)
+	if err != nil {
+		return nil, err
+	}
+	if balance == nil {
+		// TODO: move error to domain errors
+		return nil, fmt.Errorf("balance does not exist; id = %d", balanceID)
+	}
+	return buc.ts.GetBalanceTransactions(ctx, balanceID, limit, offset, orderBy)
 }
 
 func (buc *ManagerUseCase) GetBalanceByID(ctx context.Context, id int64) (*entity.Balance, error) {

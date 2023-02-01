@@ -29,6 +29,61 @@ func NewTransactionStorage(pool pgx.PgxIface, logger *logger.Logger) *transactio
 	}
 }
 
+// TODO
+func (ts *transactionStorage) GetBalanceTransactions(ctx context.Context, balanceID int64, limit, offset uint64, orderBy string) ([]*entity.Transaction, error) {
+	// select * from "transaction" as t where t.source_id = <balanceID> or t.destination_id = <balanceID> ORDER BY id;
+	// non-optimized: select * from "transaction" as t where t.source_id = <balanceID> or t.destination_id = <balanceID> ORDER BY id LIMIT <limit> OFFSET <offset>;
+	orderBys := make([]string, 0)
+	orderBys = append(orderBys, orderBy)
+	if orderBy != "id" {
+		orderBys = append(orderBys, "id")
+	}
+	sql, args, buildErr := ts.queryBuilder.
+		Select("id", "source_id", "destination_id", "amount",
+			"ttype", "date_time_created", "date_time_updated", "status").
+		From(ts.tableScheme).Where(
+		sq.Or{
+			sq.Eq{"source_id": balanceID},
+			sq.Eq{"destination_id": balanceID},
+		}).Limit(limit).Offset(offset).OrderBy(orderBys...).ToSql()
+	ts.logger.Info("select sql",
+		zap.String("table", ts.tableScheme),
+		zap.String("sql", sql),
+		zap.String("args", fmt.Sprintf("%v", args)))
+	if buildErr != nil {
+		// TODO: add wrapping
+		// buildErr
+		return nil, buildErr
+	}
+	rows, err := ts.pool.Query(ctx, sql, args...)
+	if err != nil {
+		// TODO: add wrapping
+		return nil, err
+	}
+	defer rows.Close()
+
+	page := make([]*entity.Transaction, 0)
+	for rows.Next() {
+		transaction := entity.Transaction{}
+		if err = rows.Scan(
+			&transaction.ID,
+			&transaction.SourceID,
+			&transaction.DestinationID,
+			&transaction.Amount,
+			&transaction.TType,
+			&transaction.DateTimeCreated,
+			&transaction.DateTimeUpdated,
+			&transaction.Status,
+		); err != nil {
+			// TODO: add wrapping
+			return nil, err
+		}
+
+		page = append(page, &transaction)
+	}
+	return page, nil
+}
+
 func (ts *transactionStorage) UpdateStatusByID(ctx context.Context, id uint64, status entity.TransactionStatus) error {
 	sql, args, buildErr := ts.queryBuilder.
 		Update(ts.tableScheme).Set("status", status).

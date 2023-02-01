@@ -22,7 +22,7 @@ import (
 func main() {
 	port := 8000
 	ctx := context.Background()
-	cfg := relational.NewSQLConnectConfig("gorm", "gorm", "localhost", "5432", "public")
+	cfg := relational.NewSQLConnectConfig("gorm", "gorm", "postgres", "5432", "gorm")
 	retryCfg := db.NewRetryConfig(5, 3*time.Second)
 	var err error
 	var pool pgx.PgxIface
@@ -30,6 +30,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	defer pool.Close()
 
 	l, err := zap.NewProduction()
 	if err != nil {
@@ -54,5 +55,6 @@ func main() {
 	e := echo.New()
 	s := v1.NewServer(managerUseCase, conv, log)
 	v1.RegisterHandlers(e, s)
-	e.Logger.Fatal(e.Start(fmt.Sprintf("0.0.0.0:%d", port)))
+	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", port)))
+
 }

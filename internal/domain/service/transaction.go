@@ -13,6 +13,7 @@ type TransactionStorage interface {
 	GetByID(ctx context.Context, id uint64) (*entity.Transaction, error)
 	Create(ctx context.Context, transaction entity.Transaction) (*entity.Transaction, error)
 	UpdateStatusByID(ctx context.Context, id uint64, status entity.TransactionStatus) error
+	GetBalanceTransactions(ctx context.Context, balanceID int64, limit, offset uint64, orderBy string) ([]*entity.Transaction, error)
 }
 
 type TransactionService struct {
@@ -65,4 +66,8 @@ func (t *TransactionService) CreateDefaultTransaction(ctx context.Context, sourc
 		Amount: amount, SourceID: sourceID, DestinationID: destinationID,
 		Status: entity.StatusCreated, DateTimeCreated: now, DateTimeUpdated: now, TType: ttype}
 	return t.storage.Create(ctx, transaction)
+}
+
+func (t *TransactionService) GetBalanceTransactions(ctx context.Context, balanceID int64, limit, offset uint64, orderBy string) ([]*entity.Transaction, error) {
+	return t.storage.GetBalanceTransactions(ctx, balanceID, limit, offset, orderBy)
 }

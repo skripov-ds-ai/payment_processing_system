@@ -26,7 +26,7 @@ type ServerInterface interface {
 	// (POST /balances/{id})
 	AccrueOrWriteOffBalance(ctx echo.Context, id int64) error
 
-	// (GET /balances/{id}/transcations)
+	// (GET /balances/{id}/transactions)
 	GetBindedTransactions(ctx echo.Context, id int64, params GetBindedTransactionsParams) error
 
 	// (POST /reservation/balances/{id})
@@ -260,7 +260,7 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.POST(baseURL+"/balances/:idFrom/transfer/:idTo", wrapper.TransferByIds)
 	router.GET(baseURL+"/balances/:id", wrapper.GetBalanceById)
 	router.POST(baseURL+"/balances/:id", wrapper.AccrueOrWriteOffBalance)
-	router.GET(baseURL+"/balances/:id/transcations", wrapper.GetBindedTransactions)
+	router.GET(baseURL+"/balances/:id/transactions", wrapper.GetBindedTransactions)
 	router.POST(baseURL+"/reservation/balances/:id", wrapper.ReserveOnSeparateAccount)
 	router.POST(baseURL+"/reservation/balances/:id/cancel", wrapper.CancelReservation)
 	router.POST(baseURL+"/reservation/balances/:id/confirm", wrapper.ConfirmReservation)
