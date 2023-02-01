@@ -3,7 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"os"
+	"os/signal"
 	"payment_processing_system/internal/adapters/client/kafka"
 	pgxinternal "payment_processing_system/internal/adapters/client/relational/pgx"
 	"payment_processing_system/internal/adapters/converter"
@@ -14,6 +16,7 @@ import (
 	"payment_processing_system/pkg/db/relational"
 	"payment_processing_system/pkg/db/relational/pgx"
 	"payment_processing_system/pkg/logger"
+	"syscall"
 	"time"
 
 	"github.com/deepmap/oapi-codegen/pkg/middleware"
@@ -74,6 +77,22 @@ func main() {
 
 	s := v1.NewServer(managerUseCase, conv, log)
 	v1.RegisterHandlers(e, s)
-	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", port)))
 
+	// start server in goroutine
+	go func() {
+		if err := e.Start(fmt.Sprintf(":%d", port)); err != nil && err != http.ErrServerClosed {
+			e.Logger.Fatal("shutting down the server...")
+		}
+	}()
+
+	// graceful shutdown
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGKILL, syscall.SIGTERM)
+	<-sigs
+
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+	if err := e.Shutdown(ctx); err != nil {
+		e.Logger.Fatal(err)
+	}
 }
