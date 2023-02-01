@@ -24,9 +24,8 @@ type ManagerUseCase interface {
 	GetBalanceByID(ctx context.Context, id int64) (*entity.Balance, error)
 	GetBalanceTransactions(ctx context.Context, balanceID int64, limit, offset uint64, orderBy string) ([]*entity.Transaction, error)
 	ChangeAmount(ctx context.Context, id *int64, amount decimal.Decimal) (transaction *entity.Transaction, err error)
-	// ChangeAmount(ctx context.Context, id *int64, amount decimal.Decimal) error
-	// PayForService(ctx context.Context, id *int64, amount decimal.Decimal) error
-	// Transfer(ctx context.Context, idFrom, idTo *int64, amount decimal.Decimal) error
+	PayForService(ctx context.Context, id *int64, amount decimal.Decimal) (transaction *entity.Transaction, err error)
+	Transfer(ctx context.Context, idFrom, idTo *int64, amount decimal.Decimal) (transaction *entity.Transaction, err error)
 }
 
 type managerHandler struct {
@@ -41,6 +40,46 @@ func NewBalanceHandler(useCase ManagerUseCase, converter Converter, logger *logg
 		converter: converter,
 		logger:    logger,
 	}
+}
+
+// TODO
+// (POST /balances/{idFrom}/transfer/{idTo})
+func (m *managerHandler) TransferByIds(ctx echo.Context, idFrom, idTo int64) error {
+	var balanceChangeBody NewBalance
+	err := ctx.Bind(&balanceChangeBody)
+	// TODO: validate amount. it should be > 0
+	if err != nil {
+		e := Error{
+			Message: fmt.Sprintf("something went wrong during read body ; idFrom = %d ; idTo = %d ; %v", idFrom, idTo, err),
+		}
+		_ = ctx.JSON(http.StatusBadRequest, e)
+	}
+	amount, err := decimal.NewFromString(balanceChangeBody.Amount)
+	if err != nil {
+		e := Error{
+			Message: fmt.Sprintf("something went wrong during amount converting ; idFrom = %d ; idTo = %d ; %v", idFrom, idTo, err),
+		}
+		_ = ctx.JSON(http.StatusBadRequest, e)
+		return err
+	}
+	transaction, err := m.useCase.Transfer(ctx.Request().Context(), &idFrom, &idTo, amount)
+	if err != nil {
+		e := Error{
+			Message: fmt.Sprintf("something went wrong during transfer ; idFrom = %d ; idTo = %d ; %v", idFrom, idTo, err),
+		}
+		_ = ctx.JSON(http.StatusInternalServerError, e)
+		return err
+	}
+	if transaction == nil {
+		e := Error{
+			Message: fmt.Sprintf("transaction was not created during balance changing ; idFrom = %d ; idTo = %d", idFrom, idTo),
+		}
+		_ = ctx.JSON(http.StatusInternalServerError, e)
+		// TODO
+		return errors.New("transaction was not created")
+	}
+	_ = ctx.JSON(http.StatusOK, *transaction)
+	return nil
 }
 
 // TODO
@@ -72,7 +111,7 @@ func (m *managerHandler) AccrueOrWriteOffBalance(ctx echo.Context, id int64) err
 	}
 	if transaction == nil {
 		e := Error{
-			Message: fmt.Sprintf("transaction was not created during balance changing ; id = %d ; %v", id),
+			Message: fmt.Sprintf("transaction was not created during balance changing ; id = %d", id),
 		}
 		_ = ctx.JSON(http.StatusInternalServerError, e)
 		// TODO

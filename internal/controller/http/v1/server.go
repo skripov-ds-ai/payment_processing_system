@@ -21,7 +21,7 @@ func (s *Server) FindBalances(ctx echo.Context, params FindBalancesParams) error
 
 // (POST /balances/{idFrom}/transfer/{idTo})
 func (s *Server) TransferByIds(ctx echo.Context, idFrom, idTo int64) error {
-	return nil
+	return s.manager.TransferByIds(ctx, idFrom, idTo)
 }
 
 // (GET /balances/{id})
