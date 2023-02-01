@@ -31,14 +31,14 @@ paths:
           required: false
           schema:
             type: integer
-            format: int64
+            format: uint64
         - name: page
           in: query
           description: page of collection
           required: false
           schema:
             type: integer
-            format: int64
+            format: uint64
       responses:
         '200':
           description: balance response
@@ -86,7 +86,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /balances/{id}/transcations:
+  /balances/{id}/transactions:
     get:
       description: Returns transactions binded with single ID
       operationId: get binded transactions
@@ -100,32 +100,32 @@ paths:
             format: int64
         - name: sort
           in: query
-          description: key to sort by - id, date, sum
+          description: key to sort by - id, date, amount
           required: false
           schema:
             type: string
-            enum: ["id", "date", "sum"]
+            enum: ["id", "date", "amount"]
         - name: limit
           in: query
           description: maximum number of results to return
           required: false
           schema:
             type: integer
-            format: int64
+            format: uint64
         - name: page
           in: query
           description: page of collection
           required: false
           schema:
             type: integer
-            format: int64
+            format: uint64
       responses:
         '200':
           description: pet response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Balance'
+                $ref: '#/components/schemas/Transactions'
         default:
           description: unexpected error
           content:
@@ -271,6 +271,48 @@ paths:
                 $ref: '#/components/schemas/Error'
 components:
   schemas:
+    Transactions:
+      type: array
+      items:
+        allOf:
+          - $ref: '#/components/schemas/Transaction'
+          - type: object
+    Transaction:
+      type: object
+      required:
+        - id
+        - source_id
+        - destination_id
+        - amount
+        - ttype
+        - date_time_created
+        - date_time_updated
+        - status
+      properties:
+        id:
+          type: integer
+          format: uint64
+        source_id:
+          type: integer
+          format: int64
+          nullable: true
+        destination_id:
+          type: integer
+          format: int64
+          nullable: true
+        amount:
+          type: string
+          pattern: "^[-]?[0-9]*\\.?[0-9]+$"
+        ttype:
+          type: string
+        date_time_created:
+          type: string
+          format: date-time
+        date_time_updated:
+          type: string
+          format: date-time
+        status:
+          type: string
     Balance:
       allOf:
         - $ref: '#/components/schemas/NewBalance'

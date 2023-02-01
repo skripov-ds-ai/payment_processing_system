@@ -41,6 +41,19 @@ services:
     networks:
       - big_net
 
+  app:
+    build:
+      dockerfile: cmd/Dockerfile
+      context: ./
+    restart: on-failure
+    depends_on:
+      - postgres
+      - kafka
+    ports:
+      - "8000:8000"
+    networks:
+      - big_net
+
 networks:
   big_net:
     driver: bridge
