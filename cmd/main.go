@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
 	"payment_processing_system/internal/adapters/client/kafka"
 	pgxinternal "payment_processing_system/internal/adapters/client/relational/pgx"
 	"payment_processing_system/internal/adapters/converter"
@@ -15,7 +16,9 @@ import (
 	"payment_processing_system/pkg/logger"
 	"time"
 
+	"github.com/deepmap/oapi-codegen/pkg/middleware"
 	"github.com/labstack/echo/v4"
+	echomiddleware "github.com/labstack/echo/v4/middleware"
 	"go.uber.org/zap"
 )
 
@@ -52,7 +55,23 @@ func main() {
 	producer := kafka.NewApplyTransactionProducer()
 
 	managerUseCase := usecase.NewManagerUseCase(bService, tService, producer)
+
+	swagger, err := v1.GetSwagger()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error loading swagger spec\n: %s", err)
+		os.Exit(1)
+	}
+	// Clear out the servers array in the swagger spec, that skips validating
+	// that server names match. We don't know how this thing will be run.
+	swagger.Servers = nil
+
 	e := echo.New()
+	// Log all requests
+	e.Use(echomiddleware.Logger())
+	// Use our validation middleware to check all requests against the
+	// OpenAPI schema.
+	e.Use(middleware.OapiRequestValidator(swagger))
+
 	s := v1.NewServer(managerUseCase, conv, log)
 	v1.RegisterHandlers(e, s)
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", port)))
