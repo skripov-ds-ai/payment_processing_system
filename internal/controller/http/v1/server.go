@@ -31,7 +31,7 @@ func (s *Server) GetBalanceById(ctx echo.Context, id int64, params GetBalanceByI
 
 // (POST /balances/{id})
 func (s *Server) AccrueOrWriteOffBalance(ctx echo.Context, id int64) error {
-	return nil
+	return s.manager.AccrueOrWriteOffBalance(ctx, id)
 }
 
 // (GET /balances/{id}/transcations)

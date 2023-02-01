@@ -2,6 +2,7 @@ package v1
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"payment_processing_system/internal/domain/entity"
@@ -22,6 +23,7 @@ type Converter interface {
 type ManagerUseCase interface {
 	GetBalanceByID(ctx context.Context, id int64) (*entity.Balance, error)
 	GetBalanceTransactions(ctx context.Context, balanceID int64, limit, offset uint64, orderBy string) ([]*entity.Transaction, error)
+	ChangeAmount(ctx context.Context, id *int64, amount decimal.Decimal) (transaction *entity.Transaction, err error)
 	// ChangeAmount(ctx context.Context, id *int64, amount decimal.Decimal) error
 	// PayForService(ctx context.Context, id *int64, amount decimal.Decimal) error
 	// Transfer(ctx context.Context, idFrom, idTo *int64, amount decimal.Decimal) error
@@ -41,9 +43,47 @@ func NewBalanceHandler(useCase ManagerUseCase, converter Converter, logger *logg
 	}
 }
 
+// TODO
+// (POST /balances/{id})
+func (m *managerHandler) AccrueOrWriteOffBalance(ctx echo.Context, id int64) error {
+	var balanceChangeBody NewBalance
+	err := ctx.Bind(&balanceChangeBody)
+	if err != nil {
+		e := Error{
+			Message: fmt.Sprintf("something went wrong during read body ; id = %d ; %v", id, err),
+		}
+		_ = ctx.JSON(http.StatusBadRequest, e)
+	}
+	amount, err := decimal.NewFromString(balanceChangeBody.Amount)
+	if err != nil {
+		e := Error{
+			Message: fmt.Sprintf("something went wrong during amount converting ; id = %d ; %v", id, err),
+		}
+		_ = ctx.JSON(http.StatusBadRequest, e)
+		return err
+	}
+	transaction, err := m.useCase.ChangeAmount(ctx.Request().Context(), &id, amount)
+	if err != nil {
+		e := Error{
+			Message: fmt.Sprintf("something went wrong during balance changing ; id = %d ; %v", id, err),
+		}
+		_ = ctx.JSON(http.StatusInternalServerError, e)
+		return err
+	}
+	if transaction == nil {
+		e := Error{
+			Message: fmt.Sprintf("transaction was not created during balance changing ; id = %d ; %v", id),
+		}
+		_ = ctx.JSON(http.StatusInternalServerError, e)
+		// TODO
+		return errors.New("transaction was not created")
+	}
+	_ = ctx.JSON(http.StatusOK, *transaction)
+	return nil
+}
+
 // (GET /balances/{id}/transcations)
 func (m *managerHandler) GetBindedTransactions(ctx echo.Context, id int64, params GetBindedTransactionsParams) error {
-	m.logger.Info("!")
 	// TODO: add validation by validator
 	var limit, offset uint64
 	limit = 10
