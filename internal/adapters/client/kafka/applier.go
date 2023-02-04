@@ -3,25 +3,29 @@ package kafka
 import (
 	"context"
 	"payment_processing_system/internal/domain/entity"
-	"payment_processing_system/pkg/kafka/pubsub"
+	"payment_processing_system/pkg/kafka/messages"
 	"time"
 
 	jsoniter "github.com/json-iterator/go"
 	"github.com/segmentio/kafka-go"
 )
 
-type ApplyTransactionProducer struct {
-	topic    string
-	producer pubsub.Producer
+type Producer interface {
+	PublishMessage(ctx context.Context, msgs ...kafka.Message) error
+	Close() error
 }
 
-func NewApplyTransactionProducer(topic string, producer pubsub.Producer) *ApplyTransactionProducer {
+type ApplyTransactionProducer struct {
+	topic    string
+	producer Producer
+}
+
+func NewApplyTransactionProducer(topic string, producer Producer) *ApplyTransactionProducer {
 	return &ApplyTransactionProducer{topic: topic, producer: producer}
 }
 
-// TODO: implement
 func (a *ApplyTransactionProducer) ApplyTransaction(ctx context.Context, transaction entity.Transaction) error {
-	dto := ApplyTransactionEvent{Transaction: transaction}
+	dto := messages.ApplyTransactionEvent{Transaction: transaction}
 	dtoBs, err := jsoniter.Marshal(dto)
 	if err != nil {
 		return err

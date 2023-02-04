@@ -7,25 +7,22 @@ import (
 	"github.com/segmentio/kafka-go"
 )
 
-type Producer interface {
-	PublishMessage(ctx context.Context, msgs ...kafka.Message) error
-	Close() error
-}
-
 type producer struct {
 	log     *logger.Logger
 	address []string
 	w       *kafka.Writer
+	topic   string
 }
 
 // NewProducer create new kafka producer
-func NewProducer(address []string, log *logger.Logger) *producer {
+func NewProducer(address []string, topic string, log *logger.Logger) *producer {
 	writer := kafka.Writer{
 		Addr:        kafka.TCP(address...),
+		Topic:       topic,
 		Logger:      kafka.LoggerFunc(log.Infof),
 		ErrorLogger: kafka.LoggerFunc(log.Errorf),
 	}
-	return &producer{log: log, address: address, w: &writer}
+	return &producer{log: log, address: address, w: &writer, topic: topic}
 }
 
 func (p *producer) PublishMessage(ctx context.Context, msgs ...kafka.Message) error {

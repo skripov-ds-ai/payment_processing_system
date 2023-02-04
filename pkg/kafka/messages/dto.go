@@ -1,4 +1,4 @@
-package kafka
+package messages
 
 import "payment_processing_system/internal/domain/entity"
 
