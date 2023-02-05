@@ -10,6 +10,7 @@ import (
 	pgxinternal "payment_processing_system/internal/adapters/client/relational/pgx"
 	"payment_processing_system/internal/adapters/converter"
 	v1 "payment_processing_system/internal/controller/http/v1"
+	"payment_processing_system/internal/controller/kafka/handler"
 	"payment_processing_system/internal/domain/service"
 	"payment_processing_system/internal/domain/usecase"
 	"payment_processing_system/pkg/db"
@@ -58,10 +59,44 @@ func main() {
 
 	// TODO
 	address := make([]string, 0)
-	kafkaPubSub := pubsub.NewProducer(address, log)
-	producer := kafka.NewApplyTransactionProducer("apply", kafkaPubSub)
+	// applyPublisher := pubsub.NewProducer(address, log)
+	applyPublisher, err := pubsub.NewPublisher(address, "transaction_applier")
+	// TODO
+	// if err != nil {
+	//
+	// }
+	producer := kafka.NewApplyTransactionProducer("apply", applyPublisher)
 
 	managerUseCase := usecase.NewManagerUseCase(bService, tService, producer)
+
+	transactionStatusPublisher, err := pubsub.NewPublisher(address, "transaction_status_manager")
+	// TODO
+	// if err != nil {
+	//
+	// }
+	transactionStatusProducer := kafka.NewVerifyTransactionProducer("cancel", "complete", transactionStatusPublisher)
+	applierUseCase := usecase.NewApplierUseCase(bService, transactionStatusProducer)
+	verifierUseCase := usecase.NewVerifierUseCase(tService)
+	consumerHandler := handler.NewConsumerHandler(applierUseCase, verifierUseCase)
+
+	consumer, err := pubsub.NewReader(address, "")
+	// TODO
+	// if err
+	// TODO
+	topics := []string{"apply", "complete", "cancel"}
+	go func() {
+		for {
+			if err := consumer.Consume(ctx, topics, consumerHandler); err != nil {
+				// TODO
+			}
+			if ctx.Err() != nil {
+				// TODO
+				return
+			}
+		}
+	}()
+
+	// TODO: fix and graceful shutdown
 
 	swagger, err := v1.GetSwagger()
 	if err != nil {

@@ -18,18 +18,18 @@ import (
 //}
 
 type publisher struct {
-	kafkaVersion string
-	appName      string
-	address      []string
-	producer     sarama.AsyncProducer
+	appName  string
+	address  []string
+	producer sarama.AsyncProducer
 }
 
-func NewPublisher(address []string, kafkaVersion, appName string) (*publisher, error) {
+func NewPublisher(address []string, appName string) (*publisher, error) {
 	//version, err := sarama.ParseKafkaVersion(kafkaVersion)
 	//if err != nil {
 	//	return nil, err
 	//}
 	producerConfig := sarama.NewConfig()
+	// TODO
 	producerConfig.Net.MaxOpenRequests = 1
 	//producerConfig.Version = version
 	producerConfig.Version = sarama.V2_8_1_0
@@ -45,7 +45,7 @@ func NewPublisher(address []string, kafkaVersion, appName string) (*publisher, e
 		return nil, err
 	}
 	return &publisher{
-		appName: appName, kafkaVersion: kafkaVersion,
+		appName: appName,
 		address: address, producer: p,
 	}, nil
 }

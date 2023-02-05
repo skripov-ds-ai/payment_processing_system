@@ -8,7 +8,8 @@ type reader struct {
 	consumerGroup sarama.ConsumerGroup
 }
 
-func NewReader(address []string, groupID string) (*reader, error) {
+//func NewReader(address []string, groupID string) (*reader, error) {
+func NewReader(address []string, groupID string) (sarama.ConsumerGroup, error) {
 	config := sarama.NewConfig()
 	//config.ClientID = clientID
 	// TODO: move from hardcode
@@ -21,10 +22,11 @@ func NewReader(address []string, groupID string) (*reader, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &reader{
-		consumerGroup: consumer,
-		address:       address, groupID: groupID,
-	}, nil
+	return consumer, nil
+	//return &reader{
+	//	consumerGroup: consumer,
+	//	address:       address, groupID: groupID,
+	//}, nil
 }
 
 //type consumer struct {

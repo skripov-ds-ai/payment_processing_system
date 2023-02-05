@@ -10,12 +10,6 @@ import (
 	jsoniter "github.com/json-iterator/go"
 )
 
-type Producer interface {
-	//PublishMessage(ctx context.Context, msgs ...kafka.Message) error
-	PublishMessage(msgs ...*sarama.ProducerMessage) error
-	Close() error
-}
-
 type ApplyTransactionProducer struct {
 	topic    string
 	producer Producer
@@ -32,11 +26,5 @@ func (a *ApplyTransactionProducer) ApplyTransaction(ctx context.Context, transac
 		return err
 	}
 	message := sarama.ProducerMessage{Topic: a.topic, Value: sarama.ByteEncoder(dtoBs), Timestamp: time.Now()}
-	//message := kafka.Message{
-	//	Topic: a.topic,
-	//	Value: dtoBs,
-	//	Time:  time.Now(),
-	//}
-	//return a.producer.PublishMessage(ctx, message)
 	return a.producer.PublishMessage(&message)
 }
