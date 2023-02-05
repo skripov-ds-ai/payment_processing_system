@@ -2,16 +2,17 @@ package kafka
 
 import (
 	"context"
+	"github.com/Shopify/sarama"
+	"payment_processing_system/internal/controller/kafka/messages"
 	"payment_processing_system/internal/domain/entity"
-	"payment_processing_system/pkg/kafka/messages"
 	"time"
 
 	jsoniter "github.com/json-iterator/go"
-	"github.com/segmentio/kafka-go"
 )
 
 type Producer interface {
-	PublishMessage(ctx context.Context, msgs ...kafka.Message) error
+	//PublishMessage(ctx context.Context, msgs ...kafka.Message) error
+	PublishMessage(msgs ...*sarama.ProducerMessage) error
 	Close() error
 }
 
@@ -30,10 +31,12 @@ func (a *ApplyTransactionProducer) ApplyTransaction(ctx context.Context, transac
 	if err != nil {
 		return err
 	}
-	message := kafka.Message{
-		Topic: a.topic,
-		Value: dtoBs,
-		Time:  time.Now(),
-	}
-	return a.producer.PublishMessage(ctx, message)
+	message := sarama.ProducerMessage{Topic: a.topic, Value: sarama.ByteEncoder(dtoBs), Timestamp: time.Now()}
+	//message := kafka.Message{
+	//	Topic: a.topic,
+	//	Value: dtoBs,
+	//	Time:  time.Now(),
+	//}
+	//return a.producer.PublishMessage(ctx, message)
+	return a.producer.PublishMessage(&message)
 }

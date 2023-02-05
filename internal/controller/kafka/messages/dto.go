@@ -9,11 +9,11 @@ type ApplyTransactionEvent struct {
 
 // CancelTransactionEvent is event to mark transaction status "cancelled"
 type CancelTransactionEvent struct {
-	TransactionID string `json:"transaction_id"`
+	TransactionID uint64 `json:"transaction_id"`
 }
 
 // CompleteTransactionEvent is event to mark transaction
 // status "completed" and finish transaction
 type CompleteTransactionEvent struct {
-	TransactionID string `json:"transaction_id"`
+	TransactionID uint64 `json:"transaction_id"`
 }
